@@ -1,4 +1,4 @@
-import { appToken } from "../token.tsx";
+import { appToken } from "./token.tsx";
 
 export const fetchData = async () => {
   try {
