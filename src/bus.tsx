@@ -10,7 +10,6 @@ interface RouteData {
 
 const BusDataDisplay: React.FC = () => {
   const busDataArray: RouteData[] = busData as RouteData[];
-
   const [selectedDate1, setSelectedDate1] = useState<string>("2001-01");
   const [selectedDate2, setSelectedDate2] = useState<string>("2002-01");
 
@@ -24,10 +23,8 @@ const BusDataDisplay: React.FC = () => {
   const filteredData1 = returnSelectedDate(selectedDate1);
   const filteredData2 = returnSelectedDate(selectedDate2);
 
-  interface extendedRouteData extends RouteData {
-    monthtotal2: String;
-  }
-  const combinedFilteredData: extendedRouteData[] = [];
+  type combinedRouteData = RouteData & { monthtotal2: string };
+  const combinedFilteredData: combinedRouteData[] = [];
 
   filteredData1.forEach((item1) => {
     const matchingItem2 = filteredData2.find(
@@ -43,7 +40,10 @@ const BusDataDisplay: React.FC = () => {
   });
 
   filteredData2.forEach((item2) => {
-    if (!filteredData1.find((item1) => item1.route === item2.route)) {
+    const matchingItem1 = filteredData1.find(
+      (item1) => item1.route === item2.route
+    );
+    if (!matchingItem1) {
       combinedFilteredData.push({
         route: item2.route,
         routename: item2.routename,
@@ -92,7 +92,7 @@ const BusDataDisplay: React.FC = () => {
         </thead>
         <tbody>
           {combinedFilteredData.map(
-            (item: extendedRouteData, index: number) => (
+            (item: combinedRouteData, index: number) => (
               <tr key={index}>
                 <td>{item.route}</td>
                 <td>{item.routename}</td>
