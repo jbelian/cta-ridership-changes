@@ -2,15 +2,13 @@
   "name": "cta-trends",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://jbelian.github.io/cta-trends/",
+  "homepage": "https://jbelian.github.io/",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "preview": "vite preview"
   },
   "dependencies": {
     "react": "^18.2.0",
