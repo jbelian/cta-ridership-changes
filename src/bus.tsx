@@ -3,9 +3,9 @@ import busData from "./bus.json";
 
 interface RouteData {
   route: string;
-  routeName: string;
-  monthBeginning: string;
-  monthTotal: string;
+  routename: string;
+  month_beginning: string;
+  monthtotal: string;
 }
 
 const BusDataDisplay: React.FC = () => {
@@ -16,7 +16,7 @@ const BusDataDisplay: React.FC = () => {
 
   const returnSelectedDate = (selectedDate: string) => {
     return busDataArray.filter((item) => {
-      const itemMonth = item.monthBeginning.substring(0, 7);
+      const itemMonth = item.month_beginning.substring(0, 7);
       return itemMonth === selectedDate;
     });
   };
@@ -25,7 +25,7 @@ const BusDataDisplay: React.FC = () => {
   const filteredData2 = returnSelectedDate(selectedDate2);
 
   interface extendedRouteData extends RouteData {
-    monthTotal2: string;
+    monthtotal2: string;
   }
   const combinedFilteredData: extendedRouteData[] = [];
 
@@ -35,10 +35,10 @@ const BusDataDisplay: React.FC = () => {
     );
     combinedFilteredData.push({
       route: item1.route,
-      routeName: item1.routeName,
-      monthBeginning: item1.monthBeginning,
-      monthTotal: item1.monthTotal,
-      monthTotal2: matchingItem2 ? matchingItem2.monthTotal : "",
+      routename: item1.routename,
+      month_beginning: item1.month_beginning,
+      monthtotal: item1.monthtotal,
+      monthtotal2: matchingItem2 ? matchingItem2.monthtotal : "",
     });
   });
 
@@ -46,10 +46,10 @@ const BusDataDisplay: React.FC = () => {
     if (!filteredData1.find((item1) => item1.route === item2.route)) {
       combinedFilteredData.push({
         route: item2.route,
-        routeName: item2.routeName,
-        monthBeginning: item2.monthBeginning,
-        monthTotal: "",
-        monthTotal2: item2.monthTotal,
+        routename: item2.routename,
+        month_beginning: item2.month_beginning,
+        monthtotal: "",
+        monthtotal2: item2.monthtotal,
       });
     }
   });
@@ -95,10 +95,10 @@ const BusDataDisplay: React.FC = () => {
             (item: extendedRouteData, index: number) => (
               <tr key={index}>
                 <td>{item.route}</td>
-                <td>{item.routeName}</td>
-                {/* <td>{item.monthBeginning}</td> */}
-                <td>{item.monthTotal}</td>
-                <td>{item.monthTotal2}</td>
+                <td>{item.routename}</td>
+                {/* <td>{item.month_beginning}</td> */}
+                <td>{item.monthtotal}</td>
+                <td>{item.monthtotal2}</td>
               </tr>
             )
           )}
