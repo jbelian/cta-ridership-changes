@@ -25,7 +25,8 @@ const BusDataDisplay: React.FC = () => {
   const filteredData2 = returnSelectedDate(selectedDate2);
 
   interface extendedRouteData extends RouteData {
-    monthtotal2: String;
+    monthtotal2: string;
+    //percentDiff: number;
   }
   const combinedFilteredData: extendedRouteData[] = [];
 
