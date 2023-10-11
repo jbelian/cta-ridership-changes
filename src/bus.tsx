@@ -7,7 +7,7 @@ const BusDataDisplay: React.FC = () => {
     route: string;
     routename: string;
     month_beginning: string;
-    monthtotal: number;
+    monthtotal: string;
   }
 
   const busDataArray: routeData[] = busData as routeData[];
@@ -26,7 +26,7 @@ const BusDataDisplay: React.FC = () => {
   const filteredData2 = returnSelectedDate(selectedDate2);
 
   interface extendedRouteData extends routeData {
-    monthtotal2: number;
+    monthtotal2: string;
     percentChange: string;
   }
   const combinedFilteredData: extendedRouteData[] = [];
@@ -37,7 +37,9 @@ const BusDataDisplay: React.FC = () => {
     );
 
     const i = item1.monthtotal;
-    const j = matchingItem2 ? matchingItem2.monthtotal : 0;
+    const j = matchingItem2 ? matchingItem2.monthtotal : "";
+    const x = parseFloat(i);
+    const y = parseFloat(j);
 
     combinedFilteredData.push({
       route: item1.route,
@@ -46,7 +48,7 @@ const BusDataDisplay: React.FC = () => {
       monthtotal: i,
       monthtotal2: j,
       percentChange: matchingItem2
-        ? (((j - i) / Math.abs(i)) * 100).toFixed(1)
+        ? (((y - x) / Math.abs(x)) * 100).toFixed(1) + "%"
         : "",
     });
   });
@@ -57,7 +59,7 @@ const BusDataDisplay: React.FC = () => {
         route: item2.route,
         routename: item2.routename,
         month_beginning: item2.month_beginning,
-        monthtotal: 0,
+        monthtotal: "",
         monthtotal2: item2.monthtotal,
         percentChange: "",
       });
