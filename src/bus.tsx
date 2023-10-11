@@ -1,15 +1,19 @@
 import React, { useState } from "react";
 import busData from "./bus.json";
 
-interface RouteData {
-  route: string;
-  routename: string;
-  month_beginning: string;
-  monthtotal: string;
-}
-
 const BusDataDisplay: React.FC = () => {
-  const busDataArray: RouteData[] = busData as RouteData[];
+  // Keeping variable names as they are in the incoming JSON file
+  interface routeData {
+    route: string;
+    routename: string;
+    month_beginning: string;
+    avg_weekday_rides: string;
+    avg_saturday_rides: string;
+    avg_sunday_holiday_rides: string;
+    monthtotal: string;
+  }
+
+  const busDataArray: routeData[] = busData as routeData[];
 
   const [selectedDate1, setSelectedDate1] = useState<string>("2001-01");
   const [selectedDate2, setSelectedDate2] = useState<string>("2002-01");
@@ -24,8 +28,9 @@ const BusDataDisplay: React.FC = () => {
   const filteredData1 = returnSelectedDate(selectedDate1);
   const filteredData2 = returnSelectedDate(selectedDate2);
 
-  interface extendedRouteData extends RouteData {
-    monthtotal2: string;
+  interface extendedRouteData extends routeData {
+    monthtotal2: number;
+    percentChange: string;
   }
   const combinedFilteredData: extendedRouteData[] = [];
 
@@ -33,12 +38,19 @@ const BusDataDisplay: React.FC = () => {
     const matchingItem2 = filteredData2.find(
       (item2) => item2.route === item1.route
     );
+
+    const i = item1.monthtotal;
+    const j = matchingItem2 ? matchingItem2.monthtotal : 0;
+
     combinedFilteredData.push({
       route: item1.route,
       routename: item1.routename,
       month_beginning: item1.month_beginning,
-      monthtotal: item1.monthtotal,
-      monthtotal2: matchingItem2 ? matchingItem2.monthtotal : "",
+      monthtotal: i,
+      monthtotal2: j,
+      percentChange: matchingItem2
+        ? (((j - i) / Math.abs(i)) * 100).toFixed(1)
+        : "",
     });
   });
 
@@ -48,8 +60,9 @@ const BusDataDisplay: React.FC = () => {
         route: item2.route,
         routename: item2.routename,
         month_beginning: item2.month_beginning,
-        monthtotal: "",
+        monthtotal: 0,
         monthtotal2: item2.monthtotal,
+        percentChange: "",
       });
     }
   });
@@ -88,6 +101,7 @@ const BusDataDisplay: React.FC = () => {
             {/* <th>Month Beginning</th> */}
             <th>Monthly Ridership 1</th>
             <th>Monthly Ridership 2</th>
+            <th>Change</th>
           </tr>
         </thead>
         <tbody>
@@ -99,6 +113,7 @@ const BusDataDisplay: React.FC = () => {
                 {/* <td>{item.month_beginning}</td> */}
                 <td>{item.monthtotal}</td>
                 <td>{item.monthtotal2}</td>
+                <td>{item.percentChange}</td>
               </tr>
             )
           )}
