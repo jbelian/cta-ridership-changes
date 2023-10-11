@@ -3,15 +3,19 @@ import busData from "./bus.json";
 
 const BusDataDisplay: React.FC = () => {
   // Keeping variable names as they are in the incoming JSON file
-  interface routeData {
+  interface RouteData {
     route: string;
     routename: string;
     month_beginning: string;
-    monthtotal: number;
+    monthtotal: string;
   }
 
-  const busDataArray: routeData[] = busData as routeData[];
+  interface ExtendedRouteData extends RouteData {
+    monthtotal2: string;
+    percentChange: string;
+  }
 
+  const busDataArray: RouteData[] = busData as RouteData[];
   const [selectedDate1, setSelectedDate1] = useState<string>("2001-01");
   const [selectedDate2, setSelectedDate2] = useState<string>("2002-01");
 
@@ -24,12 +28,7 @@ const BusDataDisplay: React.FC = () => {
 
   const filteredData1 = returnSelectedDate(selectedDate1);
   const filteredData2 = returnSelectedDate(selectedDate2);
-
-  interface extendedRouteData extends routeData {
-    monthtotal2: number;
-    percentChange: string;
-  }
-  const combinedFilteredData: extendedRouteData[] = [];
+  const combinedFilteredData: ExtendedRouteData[] = [];
 
   filteredData1.forEach((item1) => {
     const matchingItem2 = filteredData2.find(
@@ -37,7 +36,9 @@ const BusDataDisplay: React.FC = () => {
     );
 
     const i = item1.monthtotal;
-    const j = matchingItem2 ? matchingItem2.monthtotal : 0;
+    const j = matchingItem2 ? matchingItem2.monthtotal : "";
+    const x = parseFloat(i);
+    const y = parseFloat(j);
 
     combinedFilteredData.push({
       route: item1.route,
@@ -46,18 +47,21 @@ const BusDataDisplay: React.FC = () => {
       monthtotal: i,
       monthtotal2: j,
       percentChange: matchingItem2
-        ? (((j - i) / Math.abs(i)) * 100).toFixed(1)
+        ? (((y - x) / Math.abs(x)) * 100).toFixed(1)
         : "",
     });
   });
 
   filteredData2.forEach((item2) => {
-    if (!filteredData1.find((item1) => item1.route === item2.route)) {
+    const matchingItem1 = filteredData1.find(
+      (item1) => item1.route === item2.route
+    );
+    if (!matchingItem1) {
       combinedFilteredData.push({
         route: item2.route,
         routename: item2.routename,
         month_beginning: item2.month_beginning,
-        monthtotal: 0,
+        monthtotal: "",
         monthtotal2: item2.monthtotal,
         percentChange: "",
       });
@@ -103,7 +107,7 @@ const BusDataDisplay: React.FC = () => {
         </thead>
         <tbody>
           {combinedFilteredData.map(
-            (item: extendedRouteData, index: number) => (
+            (item: ExtendedRouteData, index: number) => (
               <tr key={index}>
                 <td>{item.route}</td>
                 <td>{item.routename}</td>
