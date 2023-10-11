@@ -7,10 +7,7 @@ const BusDataDisplay: React.FC = () => {
     route: string;
     routename: string;
     month_beginning: string;
-    avg_weekday_rides: string;
-    avg_saturday_rides: string;
-    avg_sunday_holiday_rides: string;
-    monthtotal: string;
+    monthtotal: number;
   }
 
   const busDataArray: routeData[] = busData as routeData[];
