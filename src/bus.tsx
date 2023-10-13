@@ -19,10 +19,9 @@ const BusDataDisplay: React.FC = () => {
   const [selectedDate1, setSelectedDate1] = useState<string>("2001-01");
   const [selectedDate2, setSelectedDate2] = useState<string>("2002-01");
 
-  const returnSelectedDate = (selectedDate: string) => {
+  const returnSelectedDate = (date: string) => {
     return busDataArray.filter((item) => {
-      const itemMonth = item.month_beginning.substring(0, 7);
-      return itemMonth === selectedDate;
+      return date === item.month_beginning.substring(0, 7);
     });
   };
 
@@ -68,6 +67,15 @@ const BusDataDisplay: React.FC = () => {
     }
   });
 
+  const getYearAndMonthName = (dateString: string) => {
+    const date = new Date(`${dateString}T00:00:00`);
+    const year = date.getFullYear();
+    const monthName = new Intl.DateTimeFormat("en-US", {
+      month: "short",
+    }).format(date);
+    return `${monthName} ${year}`;
+  };
+
   const handleDateChange = (
     event: React.ChangeEvent<HTMLInputElement>,
     setSelectedDate: React.Dispatch<React.SetStateAction<string>>
@@ -100,8 +108,8 @@ const BusDataDisplay: React.FC = () => {
             <th>Route</th>
             <th>Route Name</th>
             {/* <th>Month Beginning</th> */}
-            <th>Monthly Ridership 1</th>
-            <th>Monthly Ridership 2</th>
+            <th>{getYearAndMonthName(selectedDate1)}</th>
+            <th>{getYearAndMonthName(selectedDate2)}</th>
             <th>Change</th>
           </tr>
         </thead>
