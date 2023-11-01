@@ -85,7 +85,6 @@ const BusDataDisplay: React.FC = () => {
 
   return (
     <div>
-      <h1>Bus Data Display</h1>
       <label>Select years and months to compare</label>
       <div>
         <input

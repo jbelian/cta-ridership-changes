@@ -1,16 +1,22 @@
 import "./App.css";
+
 import BusDataDisplay from "./bus.tsx";
+import MapComponent from "./map.tsx";
 
 //import { fetchData } from "./components/fetch.tsx";
 //fetchData();
 
-function App() {
+export default function App() {
   return (
     <>
-      <h1>CTA Trends!</h1>
-      <BusDataDisplay />
+      <div className="container">
+        <aside className="sidebar">
+          <BusDataDisplay />
+        </aside>
+        <main className="map">
+          <MapComponent />
+        </main>
+      </div>
     </>
   );
 }
-
-export default App;

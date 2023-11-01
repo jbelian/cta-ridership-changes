@@ -1,19 +1,41 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+
 }
 
-.logo {
+.container {
+  display: flex;
+}
+
+.sidebar {
+  width: 500px;
+  height: 100vh;
+  background-color: #191919;
+  color: #ECDBBA;
+  overflow-y: auto;
+}
+
+.leaflet-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 500px;
+  height: 100%;
+}
+
+/* .logo {
   height: 6em;
   padding: 1.5em;
   will-change: filter;
   transition: filter 300ms;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
+
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
@@ -22,6 +44,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -39,4 +62,4 @@
 
 .read-the-docs {
   color: #888;
-}
+} */
