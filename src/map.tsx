@@ -10,6 +10,7 @@ export default function Map() {
                 attribution='<a href="http://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url={`https://{s}.tile.jawg.io/jawg-dark/{z}/{x}/{y}{r}.png?access-token=${jawgToken}`}
             />
+            {/* <GeoJSON data={geojsonData} /> */}
         </MapContainer>
     )
 }
