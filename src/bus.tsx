@@ -1,20 +1,22 @@
 import React, { useState } from "react";
 import busData from "./bus.json";
 
+// Keeping variable names as they are in the incoming JSON file
+interface RouteData {
+  route: string;
+  routename: string;
+  month_beginning: string;
+  monthtotal: string;
+}
+
+interface ExtendedRouteData extends RouteData {
+  monthtotal2: string;
+  percentChange: string;
+}
+
+export const combinedFilteredData: ExtendedRouteData[] = [];
+
 const BusDataDisplay: React.FC = () => {
-  // Keeping variable names as they are in the incoming JSON file
-  interface RouteData {
-    route: string;
-    routename: string;
-    month_beginning: string;
-    monthtotal: string;
-  }
-
-  interface ExtendedRouteData extends RouteData {
-    monthtotal2: string;
-    percentChange: string;
-  }
-
   const busDataArray: RouteData[] = busData as RouteData[];
   const [selectedDate1, setSelectedDate1] = useState<string>("2001-01");
   const [selectedDate2, setSelectedDate2] = useState<string>("2002-01");
@@ -27,7 +29,6 @@ const BusDataDisplay: React.FC = () => {
 
   const filteredData1 = returnSelectedDate(selectedDate1);
   const filteredData2 = returnSelectedDate(selectedDate2);
-  const combinedFilteredData: ExtendedRouteData[] = [];
 
   filteredData1.forEach((item1) => {
     const matchingItem2 = filteredData2.find(
@@ -84,50 +85,53 @@ const BusDataDisplay: React.FC = () => {
   };
 
   return (
-    <div>
-      <label>Select years and months to compare</label>
+    console.log(combinedFilteredData),
+    (
       <div>
-        <input
-          type="month"
-          value={selectedDate1}
-          onChange={(event) => handleDateChange(event, setSelectedDate1)}
-        />
-      </div>
-      <div>
-        <input
-          type="month"
-          value={selectedDate2}
-          onChange={(event) => handleDateChange(event, setSelectedDate2)}
-        />
-      </div>
+        <label>Select years and months to compare</label>
+        <div>
+          <input
+            type="month"
+            value={selectedDate1}
+            onChange={(event) => handleDateChange(event, setSelectedDate1)}
+          />
+        </div>
+        <div>
+          <input
+            type="month"
+            value={selectedDate2}
+            onChange={(event) => handleDateChange(event, setSelectedDate2)}
+          />
+        </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Route</th>
-            <th>Route Name</th>
-            {/* <th>Month Beginning</th> */}
-            <th>{getYearAndMonthName(selectedDate1)}</th>
-            <th>{getYearAndMonthName(selectedDate2)}</th>
-            <th>Change</th>
-          </tr>
-        </thead>
-        <tbody>
-          {combinedFilteredData.map(
-            (item: ExtendedRouteData, index: number) => (
-              <tr key={index}>
-                <td>{item.route}</td>
-                <td>{item.routename}</td>
-                {/* <td>{item.month_beginning}</td> */}
-                <td>{item.monthtotal}</td>
-                <td>{item.monthtotal2}</td>
-                <td>{item.percentChange}</td>
-              </tr>
-            )
-          )}
-        </tbody>
-      </table>
-    </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Route</th>
+              <th>Route Name</th>
+              {/* <th>Month Beginning</th> */}
+              <th>{getYearAndMonthName(selectedDate1)}</th>
+              <th>{getYearAndMonthName(selectedDate2)}</th>
+              <th>Change</th>
+            </tr>
+          </thead>
+          <tbody>
+            {combinedFilteredData.map(
+              (item: ExtendedRouteData, index: number) => (
+                <tr key={index}>
+                  <td>{item.route}</td>
+                  <td>{item.routename}</td>
+                  {/* <td>{item.month_beginning}</td> */}
+                  <td>{item.monthtotal}</td>
+                  <td>{item.monthtotal2}</td>
+                  <td>{item.percentChange}</td>
+                </tr>
+              )
+            )}
+          </tbody>
+        </table>
+      </div>
+    )
   );
 };
 
