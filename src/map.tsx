@@ -4,10 +4,10 @@ import "leaflet/dist/leaflet.css";
 import "./App.css";
 import { jawgToken } from "./token.tsx";
 import doc from "./data/doc.json";
-import { combinedFilteredData } from "./bus.tsx";
+// import { combinedFilteredData } from "./bus.tsx";
 
-console.log(combinedFilteredData);
-console.log("HELLO WORLD");
+// console.log(combinedFilteredData);
+console.log("MAP.TSX");
 function busLinePopup(feature: any, layer: any) {
   layer.bindPopup(`This is the ${feature.properties.Name} bus line`);
 }

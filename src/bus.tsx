@@ -1,73 +1,15 @@
 import React, { useState } from "react";
-import busData from "./bus.json";
+import { useBusData } from "./busDataHook.tsx";
+import { ExtendedRouteData } from "./busDataHook.tsx";
 
-// Keeping variable names as they are in the incoming JSON file
-interface RouteData {
-  route: string;
-  routename: string;
-  month_beginning: string;
-  monthtotal: string;
-}
+console.log("BUS.TSX");
 
-interface ExtendedRouteData extends RouteData {
-  monthtotal2: string;
-  percentChange: string;
-}
-
-export const combinedFilteredData: ExtendedRouteData[] = [];
-
-const BusDataDisplay: React.FC = () => {
-  const busDataArray: RouteData[] = busData as RouteData[];
-  const [selectedDate1, setSelectedDate1] = useState<string>("2001-01");
-  const [selectedDate2, setSelectedDate2] = useState<string>("2002-01");
-
-  const returnSelectedDate = (date: string) => {
-    return busDataArray.filter((item) => {
-      return date === item.month_beginning.substring(0, 7);
-    });
-  };
-
-  const filteredData1 = returnSelectedDate(selectedDate1);
-  const filteredData2 = returnSelectedDate(selectedDate2);
-
-  filteredData1.forEach((item1) => {
-    const matchingItem2 = filteredData2.find(
-      (item2) => item2.route === item1.route
-    );
-
-    const i = item1.monthtotal;
-    const j = matchingItem2 ? matchingItem2.monthtotal : "";
-    const x = parseFloat(i);
-    const y = parseFloat(j);
-
-    combinedFilteredData.push({
-      route: item1.route,
-      routename: item1.routename,
-      month_beginning: item1.month_beginning,
-      monthtotal: i,
-      monthtotal2: j,
-      percentChange: matchingItem2
-        ? (((y - x) / Math.abs(x)) * 100).toFixed(1)
-        : "",
-    });
-  });
-
-  filteredData2.forEach((item2) => {
-    const matchingItem1 = filteredData1.find(
-      (item1) => item1.route === item2.route
-    );
-    if (!matchingItem1) {
-      combinedFilteredData.push({
-        route: item2.route,
-        routename: item2.routename,
-        month_beginning: item2.month_beginning,
-        monthtotal: "",
-        monthtotal2: item2.monthtotal,
-        percentChange: "",
-      });
-    }
-  });
-
+// Component to render the bus data table
+const BusDataTable: React.FC<{
+  combinedFilteredData: ExtendedRouteData[];
+  selectedDate1: string;
+  selectedDate2: string;
+}> = ({ combinedFilteredData, selectedDate1, selectedDate2 }) => {
   const getYearAndMonthName = (dateString: string) => {
     const date = new Date(`${dateString}T00:00:00`);
     const year = date.getFullYear();
@@ -76,6 +18,42 @@ const BusDataDisplay: React.FC = () => {
     }).format(date);
     return `${monthName} ${year}`;
   };
+
+  return (
+    <table>
+      <thead>
+        <tr>
+          <th>Route</th>
+          <th>Route Name</th>
+          {/* <th>Month Beginning</th> */}
+          <th>{getYearAndMonthName(selectedDate1)}</th>
+          <th>{getYearAndMonthName(selectedDate2)}</th>
+          <th>Change</th>
+        </tr>
+      </thead>
+      <tbody>
+        {combinedFilteredData.map((item: ExtendedRouteData, index: number) => (
+          <tr key={index}>
+            <td>{item.route}</td>
+            <td>{item.routename}</td>
+            {/* <td>{item.month_beginning}</td> */}
+            <td>{item.monthtotal}</td>
+            <td>{item.monthtotal2}</td>
+            <td>{item.percentChange}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+};
+
+const BusDataDisplay: React.FC = () => {
+  // Keeping variable names as they are in the incoming JSON file
+
+  const [selectedDate1, setSelectedDate1] = useState<string>("2001-01");
+  const [selectedDate2, setSelectedDate2] = useState<string>("2002-01");
+
+  const combinedFilteredData = useBusData(selectedDate1, selectedDate2);
 
   const handleDateChange = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -104,32 +82,11 @@ const BusDataDisplay: React.FC = () => {
           />
         </div>
 
-        <table>
-          <thead>
-            <tr>
-              <th>Route</th>
-              <th>Route Name</th>
-              {/* <th>Month Beginning</th> */}
-              <th>{getYearAndMonthName(selectedDate1)}</th>
-              <th>{getYearAndMonthName(selectedDate2)}</th>
-              <th>Change</th>
-            </tr>
-          </thead>
-          <tbody>
-            {combinedFilteredData.map(
-              (item: ExtendedRouteData, index: number) => (
-                <tr key={index}>
-                  <td>{item.route}</td>
-                  <td>{item.routename}</td>
-                  {/* <td>{item.month_beginning}</td> */}
-                  <td>{item.monthtotal}</td>
-                  <td>{item.monthtotal2}</td>
-                  <td>{item.percentChange}</td>
-                </tr>
-              )
-            )}
-          </tbody>
-        </table>
+        <BusDataTable
+          combinedFilteredData={combinedFilteredData}
+          selectedDate1={selectedDate1}
+          selectedDate2={selectedDate2}
+        />
       </div>
     )
   );
