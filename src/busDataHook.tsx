@@ -1,3 +1,4 @@
+import React from "react";
 import busData from "./bus.json";
 
 export interface RouteData {
@@ -6,6 +7,7 @@ export interface RouteData {
   month_beginning: string;
   monthtotal: string;
 }
+
 export interface ExtendedRouteData extends RouteData {
   monthtotal2: string;
   percentChange: string;
@@ -67,4 +69,46 @@ export const useBusData = (
   });
 
   return combinedFilteredData;
+};
+
+export const BusDataTable: React.FC<{
+  combinedFilteredData: ExtendedRouteData[];
+  selectedDate1: string;
+  selectedDate2: string;
+}> = ({ combinedFilteredData, selectedDate1, selectedDate2 }) => {
+  const getYearAndMonthName = (dateString: string) => {
+    const date = new Date(`${dateString}T00:00:00`);
+    const year = date.getFullYear();
+    const monthName = new Intl.DateTimeFormat("en-US", {
+      month: "short",
+    }).format(date);
+    return `${monthName} ${year}`;
+  };
+
+  return (
+    <table>
+      <thead>
+        <tr>
+          <th>Route</th>
+          <th>Route Name</th>
+          {/* <th>Month Beginning</th> */}
+          <th>{getYearAndMonthName(selectedDate1)}</th>
+          <th>{getYearAndMonthName(selectedDate2)}</th>
+          <th>Change</th>
+        </tr>
+      </thead>
+      <tbody>
+        {combinedFilteredData.map((item: ExtendedRouteData, index: number) => (
+          <tr key={index}>
+            <td>{item.route}</td>
+            <td>{item.routename}</td>
+            {/* <td>{item.month_beginning}</td> */}
+            <td>{item.monthtotal}</td>
+            <td>{item.monthtotal2}</td>
+            <td>{item.percentChange}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
 };
