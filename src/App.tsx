@@ -1,22 +1,23 @@
 import "./App.css";
-
-import BusDataDisplay from "./bus.tsx";
+import React, { useState } from "react";
+import RouteSelection from "./busDisplay.tsx";
 import MapComponent from "./map.tsx";
+import { ExtendedRouteData } from "./busData.tsx";
 
-//import { fetchData } from "./components/fetch.tsx";
-//fetchData();
-
-export default function App() {
+const App: React.FC = () => {
+  const [filteredData] = useState<ExtendedRouteData[]>([]);
   return (
     <>
       <div className="container">
         <aside className="sidebar">
-          <BusDataDisplay />
+          <RouteSelection />
         </aside>
         <main className="map">
-          <MapComponent />
+          <MapComponent filteredData={filteredData} />
         </main>
       </div>
     </>
   );
-}
+};
+
+export default App;

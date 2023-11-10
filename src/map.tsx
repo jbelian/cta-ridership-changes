@@ -4,12 +4,17 @@ import "leaflet/dist/leaflet.css";
 import "./App.css";
 import { jawgToken } from "./token.tsx";
 import doc from "./data/doc.json";
+import { ExtendedRouteData } from "./busData.tsx";
 
 function busLinePopup(feature: any, layer: any) {
   layer.bindPopup(`This is the ${feature.properties.Name} bus line`);
 }
 
-export default function Map() {
+export default function MapComponent({
+  filteredData,
+}: {
+  filteredData: ExtendedRouteData[];
+}) {
   const docData = doc as FeatureCollection;
   return (
     <MapContainer className="map" center={[41.8781, -87.63]} zoom={13}>
