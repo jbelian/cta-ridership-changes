@@ -1,11 +1,10 @@
 import "./App.css";
 import React, { useState } from "react";
 import RouteSelection from "./busDisplay.tsx";
-import MapComponent from "./map.tsx";
-import { ExtendedRouteData } from "./busData.tsx";
+import Map from "./map.tsx";
+import { CombinedRoutes } from "./busData.tsx";
 
-const App: React.FC = () => {
-  const [filteredData] = useState<ExtendedRouteData[]>([]);
+const App: React.FC<{}> = () => {
   return (
     <>
       <div className="container">
@@ -13,7 +12,7 @@ const App: React.FC = () => {
           <RouteSelection />
         </aside>
         <main className="map">
-          <MapComponent filteredData={filteredData} />
+          {/* <Map filteredRoutes={filteredRoutes} /> */}
         </main>
       </div>
     </>

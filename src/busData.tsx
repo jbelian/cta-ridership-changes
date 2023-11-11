@@ -1,6 +1,6 @@
 import busData from "./bus.json";
 
-export interface RouteData {
+export interface Routes {
   // Keeping variable names as they are in the incoming JSON file
   route: string;
   routename: string;
@@ -8,16 +8,16 @@ export interface RouteData {
   monthtotal: string;
 }
 
-export interface ExtendedRouteData extends RouteData {
+export interface CombinedRoutes extends Routes {
   monthtotal2: string;
   percentChange: string;
 }
 
-export const useBusData = (
+export const parseBusData = (
   selectedDate1: string,
   selectedDate2: string
-): ExtendedRouteData[] => {
-  const busDataArray: RouteData[] = busData as RouteData[];
+): CombinedRoutes[] => {
+  const busDataArray: Routes[] = busData as Routes[];
 
   const returnSelectedDate = (date: string) => {
     return busDataArray.filter((item) => {
@@ -25,12 +25,12 @@ export const useBusData = (
     });
   };
 
-  const filteredData1 = returnSelectedDate(selectedDate1);
-  const filteredData2 = returnSelectedDate(selectedDate2);
-  const filteredData: ExtendedRouteData[] = [];
+  const filteredRoutes1 = returnSelectedDate(selectedDate1);
+  const filteredRoutes2 = returnSelectedDate(selectedDate2);
+  const filteredRoutes: CombinedRoutes[] = [];
 
-  filteredData1.forEach((item1) => {
-    const matchingItem2 = filteredData2.find(
+  filteredRoutes1.forEach((item1) => {
+    const matchingItem2 = filteredRoutes2.find(
       (item2) => item2.route === item1.route
     );
 
@@ -39,7 +39,7 @@ export const useBusData = (
     const x = parseFloat(i);
     const y = parseFloat(j);
 
-    filteredData.push({
+    filteredRoutes.push({
       route: item1.route,
       routename: item1.routename,
       month_beginning: item1.month_beginning,
@@ -51,12 +51,12 @@ export const useBusData = (
     });
   });
 
-  filteredData2.forEach((item2) => {
-    const matchingItem1 = filteredData1.find(
+  filteredRoutes2.forEach((item2) => {
+    const matchingItem1 = filteredRoutes1.find(
       (item1) => item1.route === item2.route
     );
     if (!matchingItem1) {
-      filteredData.push({
+      filteredRoutes.push({
         route: item2.route,
         routename: item2.routename,
         month_beginning: item2.month_beginning,
@@ -67,5 +67,5 @@ export const useBusData = (
     }
   });
 
-  return filteredData;
+  return filteredRoutes;
 };

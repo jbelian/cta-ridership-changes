@@ -4,18 +4,23 @@ import "leaflet/dist/leaflet.css";
 import "./App.css";
 import { jawgToken } from "./token.tsx";
 import doc from "./data/doc.json";
-import { ExtendedRouteData } from "./busData.tsx";
+import { CombinedRoutes } from "./busData.tsx";
+import { useEffect } from "react";
 
 function busLinePopup(feature: any, layer: any) {
   layer.bindPopup(`This is the ${feature.properties.Name} bus line`);
 }
 
-export default function MapComponent({
-  filteredData,
-}: {
-  filteredData: ExtendedRouteData[];
-}) {
+const Map: React.FC<{ filteredRoutes: CombinedRoutes[] }> = ({
+  filteredRoutes,
+}) => {
   const docData = doc as FeatureCollection;
+
+  // console.log(filteredRoutes);
+  // useEffect(() => {
+  //   console.log(filteredRoutes);
+  // }, [filteredRoutes]);
+
   return (
     <MapContainer className="map" center={[41.8781, -87.63]} zoom={13}>
       <TileLayer
@@ -25,4 +30,6 @@ export default function MapComponent({
       <GeoJSON data={docData} onEachFeature={busLinePopup} />
     </MapContainer>
   );
-}
+};
+
+export default Map;

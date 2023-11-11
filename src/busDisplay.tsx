@@ -1,11 +1,12 @@
-import React, { useState } from "react";
-import { useBusData } from "./busData.tsx";
-import { ExtendedRouteData } from "./busData.tsx";
+import React, { useEffect, useState } from "react";
+import { parseBusData, CombinedRoutes } from "./busData.tsx";
 
-const RouteSelection: React.FC = () => {
+// const RouteSelection: React.FC<{}> = () => {
+function RouteSelection() {
   const [selectedDate1, setSelectedDate1] = useState("2001-01");
   const [selectedDate2, setSelectedDate2] = useState("2002-01");
-  const filteredData = useBusData(selectedDate1, selectedDate2);
+  const filteredRoutes = parseBusData(selectedDate1, selectedDate2);
+  console.log(filteredRoutes);
 
   const handleDateChange = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -25,7 +26,7 @@ const RouteSelection: React.FC = () => {
 
   return (
     <div>
-      <label>Select years and months to compare YEAH</label>
+      <label>Select years and months to compare</label>
       {[selectedDate1, selectedDate2].map((selectedDate, index) => (
         <div key={index}>
           <input
@@ -51,7 +52,7 @@ const RouteSelection: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {filteredData.map((item: ExtendedRouteData, index: number) => (
+          {filteredRoutes.map((item: CombinedRoutes, index: number) => (
             <tr key={index}>
               <td>{item.route}</td>
               <td>{item.routename}</td>
@@ -64,6 +65,6 @@ const RouteSelection: React.FC = () => {
       </table>
     </div>
   );
-};
+}
 
 export default RouteSelection;
