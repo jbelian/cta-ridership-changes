@@ -1,3 +1,5 @@
+//busData.tsx
+
 import busData from "./bus.json";
 
 export interface Routes {

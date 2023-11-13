@@ -1,19 +1,24 @@
-import React, { useEffect, useState } from "react";
-import { parseBusData, CombinedRoutes } from "./busData.tsx";
+// busDisplay.tsx
 
-// const RouteSelection: React.FC<{}> = () => {
-function RouteSelection() {
-  const [selectedDate1, setSelectedDate1] = useState("2001-01");
-  const [selectedDate2, setSelectedDate2] = useState("2002-01");
-  const filteredRoutes = parseBusData(selectedDate1, selectedDate2);
-  console.log(filteredRoutes);
+import React from "react";
+import { CombinedRoutes } from "./busData.tsx";
 
-  const handleDateChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    setter: React.Dispatch<React.SetStateAction<string>>
-  ) => {
-    setter(event.target.value);
-  };
+interface RouteSelectionProps {
+  selectedDate1: string;
+  selectedDate2: string;
+  onDateChange1: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onDateChange2: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  filteredRoutes: CombinedRoutes[];
+}
+
+function RouteSelection(props: RouteSelectionProps) {
+  const {
+    selectedDate1,
+    selectedDate2,
+    onDateChange1,
+    onDateChange2,
+    filteredRoutes,
+  } = props;
 
   const getYearAndMonthName = (dateString: string) => {
     const date = new Date(`${dateString}T00:00:00`);
@@ -33,10 +38,7 @@ function RouteSelection() {
             type="month"
             value={selectedDate}
             onChange={(event) =>
-              handleDateChange(
-                event,
-                index === 0 ? setSelectedDate1 : setSelectedDate2
-              )
+              index === 0 ? onDateChange1(event) : onDateChange2(event)
             }
           />
         </div>

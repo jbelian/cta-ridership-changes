@@ -16,10 +16,9 @@ const Map: React.FC<{ filteredRoutes: CombinedRoutes[] }> = ({
 }) => {
   const docData = doc as FeatureCollection;
 
-  // console.log(filteredRoutes);
-  // useEffect(() => {
-  //   console.log(filteredRoutes);
-  // }, [filteredRoutes]);
+  useEffect(() => {
+    console.log(filteredRoutes);
+  }, [filteredRoutes]);
 
   return (
     <MapContainer className="map" center={[41.8781, -87.63]} zoom={13}>
