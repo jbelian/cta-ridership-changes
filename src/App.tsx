@@ -18,7 +18,6 @@ const App: React.FC<{}> = () => {
   };
 
   const filteredRoutes = parseBusData(selectedDate1, selectedDate2);
-  // console.log(filteredRoutes);
 
   return (
     <>

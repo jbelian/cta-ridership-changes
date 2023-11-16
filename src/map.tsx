@@ -11,10 +11,10 @@ function busLinePopup(feature: any, layer: any) {
   layer.bindPopup(`This is the ${feature.properties.Name} bus line`);
 }
 
-const Map: React.FC<{ filteredRoutes: CombinedRoutes[] }> = ({
-  filteredRoutes,
-}) => {
+const Map: React.FC<{ filteredRoutes: CombinedRoutes[] }> = ({ filteredRoutes }) => {
   const docData = doc as FeatureCollection;
+  
+  // Cast filteredRoutes to GeoJSON below tomorrow!
 
   useEffect(() => {
     console.log(filteredRoutes);
