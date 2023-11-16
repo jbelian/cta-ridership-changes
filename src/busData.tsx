@@ -48,14 +48,13 @@ export const parseBusData = (
 
   const filteredRoutes1 = returnSelectedDate(selectedDate1);
   const filteredRoutes2 = returnSelectedDate(selectedDate2);
-
-  const filteredRoutes: CombinedRoutes[] = [];
+  const combinedFilteredRoutes: CombinedRoutes[] = [];
 
   filteredRoutes1.forEach((item1) => {
     const matchingItem2 = filteredRoutes2.find(
       (item2) => item2.route === item1.route
     );
-    filteredRoutes.push(mergeRoutes(item1, matchingItem2));
+    combinedFilteredRoutes.push(mergeRoutes(item1, matchingItem2));
   });
 
   filteredRoutes2.forEach((item2) => {
@@ -63,9 +62,9 @@ export const parseBusData = (
       (item1) => item1.route === item2.route
     );
     if (!matchingItem1) {
-      filteredRoutes.push(mergeRoutes(item2, undefined));
+      combinedFilteredRoutes.push(mergeRoutes(item2, undefined));
     }
   });
 
-  return filteredRoutes;
+  return combinedFilteredRoutes;
 };
