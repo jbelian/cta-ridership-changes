@@ -6,7 +6,7 @@ import RouteSelection from "./busDisplay.tsx";
 import Map from "./map.tsx";
 import { parseBusData } from "./busData.tsx";
 
-const App: React.FC<{}> = () => {
+const App = () => {
   const [selectedDate1, setSelectedDate1] = useState("2001-01");
   const [selectedDate2, setSelectedDate2] = useState("2002-01");
 
@@ -32,7 +32,10 @@ const App: React.FC<{}> = () => {
           />
         </aside>
         <main className="map">
-          <Map filteredRoutes={filteredRoutes} />
+          <Map
+            key={`${selectedDate1}-${selectedDate2}`}
+            filteredRoutes={filteredRoutes}
+          />
         </main>
       </div>
     </>
