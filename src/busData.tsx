@@ -1,4 +1,4 @@
-// busData.tsx
+//busData.tsx
 
 import busData from "./data/bus.json";
 
@@ -9,52 +9,46 @@ export interface Routes {
   month_beginning: string;
   monthtotal: string;
 }
-
 export interface CombinedRoutes extends Routes {
   monthtotal2: string;
   percentChange: string;
 }
-
 export const parseBusData = (
   selectedDate1: string,
   selectedDate2: string
 ): CombinedRoutes[] => {
   const busDataArray: Routes[] = busData as Routes[];
 
-  const returnSelectedDate = (date: string) =>
-    busDataArray.filter(
-      (item) => date === item.month_beginning.substring(0, 7)
-    );
-
-  const calculatePercentChange = (x: number, y: number): string =>
-    (((y - x) / Math.abs(x)) * 100).toFixed(1);
-
-  const mergeRoutes = (
-    item1: Routes,
-    item2: Routes | undefined
-  ): CombinedRoutes => {
-    const i = parseFloat(item1.monthtotal);
-    const j = item2 ? parseFloat(item2.monthtotal) : NaN;
-
-    return {
-      route: item1.route,
-      routename: item1.routename,
-      month_beginning: item1.month_beginning,
-      monthtotal: item1.monthtotal,
-      monthtotal2: item2 ? item2.monthtotal : "",
-      percentChange: item2 ? calculatePercentChange(i, j) : "",
-    };
+  const returnSelectedDate = (date: string) => {
+    return busDataArray.filter((item) => {
+      return date === item.month_beginning.substring(0, 7);
+    });
   };
 
   const filteredRoutes1 = returnSelectedDate(selectedDate1);
   const filteredRoutes2 = returnSelectedDate(selectedDate2);
-  const combinedFilteredRoutes: CombinedRoutes[] = [];
+  const filteredRoutes: CombinedRoutes[] = [];
 
   filteredRoutes1.forEach((item1) => {
     const matchingItem2 = filteredRoutes2.find(
       (item2) => item2.route === item1.route
     );
-    combinedFilteredRoutes.push(mergeRoutes(item1, matchingItem2));
+
+    const i = item1.monthtotal;
+    const j = matchingItem2 ? matchingItem2.monthtotal : "";
+    const x = parseFloat(i);
+    const y = parseFloat(j);
+
+    filteredRoutes.push({
+      route: item1.route,
+      routename: item1.routename,
+      month_beginning: item1.month_beginning,
+      monthtotal: i,
+      monthtotal2: j,
+      percentChange: matchingItem2
+        ? (((y - x) / Math.abs(x)) * 100).toFixed(1)
+        : "",
+    });
   });
 
   filteredRoutes2.forEach((item2) => {
@@ -62,9 +56,16 @@ export const parseBusData = (
       (item1) => item1.route === item2.route
     );
     if (!matchingItem1) {
-      combinedFilteredRoutes.push(mergeRoutes(item2, undefined));
+      filteredRoutes.push({
+        route: item2.route,
+        routename: item2.routename,
+        month_beginning: item2.month_beginning,
+        monthtotal: "",
+        monthtotal2: item2.monthtotal,
+        percentChange: "",
+      });
     }
   });
 
-  return combinedFilteredRoutes;
+  return filteredRoutes;
 };
