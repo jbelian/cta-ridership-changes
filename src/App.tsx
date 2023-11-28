@@ -1,6 +1,5 @@
 // App.tsx
 
-import "./App.css";
 import React, { useState } from "react";
 import RouteSelection from "./busDisplay.tsx";
 import Map from "./map.tsx";
@@ -9,12 +8,14 @@ import { parseBusData } from "./busData.tsx";
 const App = () => {
   const [selectedDate1, setSelectedDate1] = useState("2001-01");
   const [selectedDate2, setSelectedDate2] = useState("2002-01");
+  const [key, setKey] = useState("");
 
   const handleDateChange = (
     event: React.ChangeEvent<HTMLInputElement>,
     setter: React.Dispatch<React.SetStateAction<string>>
   ) => {
     setter(event.target.value);
+    setKey(`${selectedDate1}-${selectedDate2}-${Date.now()}`);
   };
 
   const filteredRoutes = parseBusData(selectedDate1, selectedDate2);
@@ -31,11 +32,8 @@ const App = () => {
             filteredRoutes={filteredRoutes}
           />
         </aside>
-        <main className="map">
-          <Map
-            key={`${selectedDate1}-${selectedDate2}`}
-            filteredRoutes={filteredRoutes}
-          />
+        <main>
+          <Map keyProp={key} filteredRoutes={filteredRoutes} />
         </main>
       </div>
     </>

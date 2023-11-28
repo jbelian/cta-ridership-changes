@@ -31,18 +31,21 @@ function RouteSelection(props: RouteSelectionProps) {
 
   return (
     <div>
-      <label>Select years and months to compare</label>
-      {[selectedDate1, selectedDate2].map((selectedDate, index) => (
-        <div key={index}>
-          <input
-            type="month"
-            value={selectedDate}
-            onChange={(event) =>
-              index === 0 ? onDateChange1(event) : onDateChange2(event)
-            }
-          />
-        </div>
-      ))}
+      <label>
+        Select years and months to compare
+        {[selectedDate1, selectedDate2].map((selectedDate, index) => (
+          <div key={index}>
+            <input
+              name="date"
+              type="month"
+              value={selectedDate}
+              onChange={(event) =>
+                index === 0 ? onDateChange1(event) : onDateChange2(event)
+              }
+            />
+          </div>
+        ))}
+      </label>
       <table>
         <thead>
           <tr>
