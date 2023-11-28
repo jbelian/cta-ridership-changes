@@ -27,36 +27,43 @@ export const parseBusData = (
 
   const filteredRoutes1 = returnSelectedDate(selectedDate1);
   const filteredRoutes2 = returnSelectedDate(selectedDate2);
-  const filteredRoutes: CombinedRoutes[] = [];
+  const matchingItems: CombinedRoutes[] = [];
+  const nonMatchingItems: CombinedRoutes[] = [];
 
   filteredRoutes1.forEach((item1) => {
     const matchingItem2 = filteredRoutes2.find(
       (item2) => item2.route === item1.route
     );
 
-    const i = item1.monthtotal;
-    const j = matchingItem2 ? matchingItem2.monthtotal : "";
-    const x = parseFloat(i);
-    const y = parseFloat(j);
+    const i: string = item1.monthtotal;
+    const j: string = matchingItem2 ? matchingItem2.monthtotal : "";
+    const x: number = parseFloat(i);
+    const y: number = parseFloat(j);
 
-    filteredRoutes.push({
-      route: item1.route,
-      routename: item1.routename,
-      month_beginning: item1.month_beginning,
-      monthtotal: i,
+    const newItem: CombinedRoutes = {
+      ...item1,
       monthtotal2: j,
       percentChange: matchingItem2
         ? (((y - x) / Math.abs(x)) * 100).toFixed(1)
         : "",
-    });
+    };
+
+    if (matchingItem2) {
+      matchingItems.push(newItem);
+    } else {
+      nonMatchingItems.push(newItem);
+    }
   });
+
+  const combinedFilteredRoutes: CombinedRoutes[] =
+    matchingItems.concat(nonMatchingItems);
 
   filteredRoutes2.forEach((item2) => {
     const matchingItem1 = filteredRoutes1.find(
       (item1) => item1.route === item2.route
     );
     if (!matchingItem1) {
-      filteredRoutes.push({
+      combinedFilteredRoutes.push({
         route: item2.route,
         routename: item2.routename,
         month_beginning: item2.month_beginning,
@@ -67,5 +74,5 @@ export const parseBusData = (
     }
   });
 
-  return filteredRoutes;
+  return combinedFilteredRoutes;
 };
