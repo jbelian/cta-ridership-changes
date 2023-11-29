@@ -22,9 +22,8 @@ const Map = ({
   const matchingRoutes = doc.features.filter((feature) =>
     filteredRoutes.some((route) => route.route === feature.properties.ROUTE)
   );
-  //
+
   console.log(matchingRoutes);
-  // TOMORROW: FIGURE OUT WHY MATCHING ROUTES DOES NOT TAKE THE SET OF COMBINED ROUTES
 
   return (
     <MapContainer center={[41.8781, -87.63]} zoom={13}>
