@@ -19,11 +19,19 @@ const Map = ({
   filteredRoutes: CombinedRoutes[];
   keyProp: string;
 }) => {
-  const matchingRoutes = doc.features.filter((feature) =>
-    filteredRoutes.some((route) => route.route === feature.properties.ROUTE)
-  );
+  const matchingRoutes = {
+    type: "FeatureCollection",
+    features: doc.features.filter((feature) =>
+      filteredRoutes.some((route) => route.route === feature.properties.ROUTE)
+    ),
+  } as FeatureCollection;
 
-  console.log(matchingRoutes);
+  // Temporarily displaying routes as random colors
+  const style = () => ({
+    color: `#${Math.random().toString(16).slice(2, 8).toUpperCase()}`,
+    weight: 5,
+    opacity: 0.9,
+  });
 
   return (
     <MapContainer center={[41.8781, -87.63]} zoom={13}>
@@ -33,12 +41,8 @@ const Map = ({
       />
       <GeoJSON
         key={keyProp}
-        data={
-          {
-            type: "FeatureCollection",
-            features: matchingRoutes,
-          } as FeatureCollection
-        }
+        data={matchingRoutes}
+        style={style}
         onEachFeature={busLinePopup}
       />
     </MapContainer>
