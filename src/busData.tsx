@@ -16,7 +16,7 @@ export interface CombinedRoutes extends Routes {
   percentChange: string;
 }
 
-// Function for sorting by route number in numeric order, for example:
+// Sorts by route number in numeric order, ignoring letters, for example:
 // 31   31st
 // 55A	55th/Austin
 // 95   95th
@@ -98,7 +98,7 @@ export const parseBusData = (
     }
   });
 
-  // Sort each array of routes independently and then combine them
+  // Sorts each array of routes independently and then combines them
   combinedFilteredRoutes = [
     ...combinedFilteredRoutes.sort(compareRoutes),
     ...onlyFilteredRoutes1.sort(compareRoutes),
