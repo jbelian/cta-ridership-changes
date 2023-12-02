@@ -19,8 +19,6 @@ const App = () => {
   };
 
   const filteredRoutes = parseBusData(selectedDate1, selectedDate2);
-  console.log("filteredRoutes");
-  console.log(filteredRoutes);
 
   return (
     <>

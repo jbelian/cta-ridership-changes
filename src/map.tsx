@@ -8,10 +8,6 @@ import { jawgToken } from "./token.tsx";
 import doc from "./data/doc.json";
 import { CombinedRoutes } from "./busData.tsx";
 
-const busLinePopup = (feature: any, layer: any) => {
-  layer.bindPopup(`Bus line ${feature.properties.Name}`);
-};
-
 const Map = ({
   filteredRoutes,
   keyProp,
@@ -26,12 +22,20 @@ const Map = ({
     ),
   } as FeatureCollection;
 
-  // Temporarily displaying routes as random colors
-  const style = () => ({
-    color: `#${Math.random().toString(16).slice(2, 8).toUpperCase()}`,
-    weight: 5,
-    opacity: 0.9,
-  });
+  function onEachFeature(feature: any, layer: any) {
+    // layer.bindPopup(`Bus line ${feature.properties.Name}`);
+    if (feature.properties) {
+      const { Name, NAME2 } = feature.properties;
+      layer.bindTooltip(`${Name}, ${NAME2}`, {
+        sticky: true,
+      });
+    }
+
+    layer.setStyle({
+      weight: 4,
+      fillColor: "#FFF",
+    });
+  }
 
   return (
     <MapContainer center={[41.8781, -87.63]} zoom={13}>
@@ -42,8 +46,7 @@ const Map = ({
       <GeoJSON
         key={keyProp}
         data={matchingRoutes}
-        style={style}
-        onEachFeature={busLinePopup}
+        onEachFeature={onEachFeature}
       />
     </MapContainer>
   );
