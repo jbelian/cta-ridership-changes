@@ -1,7 +1,7 @@
 // map.tsx
 
 import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
-import { FeatureCollection } from "geojson";
+import { Feature, FeatureCollection, Geometry } from "geojson";
 import "leaflet/dist/leaflet.css";
 import "./App.css";
 import { jawgToken } from "./token.tsx";
@@ -22,19 +22,44 @@ const Map = ({
     ),
   } as FeatureCollection;
 
-  function onEachFeature(feature: any, layer: any) {
-    // layer.bindPopup(`Bus line ${feature.properties.Name}`);
+  function onEachFeature(feature: Feature<Geometry, any>, layer: any) {
+    layer.bindPopup(`Bus line ${feature.properties.Name}`);
     if (feature.properties) {
       const { Name, NAME2 } = feature.properties;
+      // layer.bringToFront;
       layer.bindTooltip(`${Name}, ${NAME2}`, {
         sticky: true,
       });
     }
 
     layer.setStyle({
-      weight: 4,
-      fillColor: "#FFF",
+      weight: 5,
+      color: setColor(feature),
+      fillOpacity: 0.5,
     });
+  }
+
+  function setColor(feature: Feature<Geometry, any>) {
+    const matchingRoute = filteredRoutes.find(
+      (route) => route.route === feature.properties.ROUTE
+    );
+
+    if (!matchingRoute) {
+      console.warn(
+        `No matching route found for feature with ROUTE: ${feature.properties.ROUTE}`
+      );
+      return "#000";
+    }
+
+    const { percentChange } = matchingRoute;
+    const factor = Math.abs(parseFloat(percentChange)) / 100;
+
+    const red = Math.round(255 * (1 - factor));
+    const blue = Math.round(255 * factor);
+    console.log(red, blue);
+    console.log(red.toString(16), blue.toString(16));
+
+    return `#${red.toString(16)}${20}${blue.toString(16)}`;
   }
 
   return (
