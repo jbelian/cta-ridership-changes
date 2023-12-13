@@ -23,19 +23,22 @@ const Map = ({
   } as FeatureCollection;
 
   function onEachFeature(feature: Feature<Geometry, any>, layer: any) {
-    layer.bindPopup(`Bus line ${feature.properties.Name}`);
+    const color = setColor(feature);
+    layer.bindPopup(
+      `Route ${feature.properties.ROUTE}
+      <br/>Color ${color?.toUpperCase()}`
+    );
     if (feature.properties) {
       const { Name, NAME2 } = feature.properties;
       // layer.bringToFront;
-      layer.bindTooltip(`${Name}, ${NAME2}`, {
+      layer.bindTooltip(`Route ${Name}<br/>${NAME2}`, {
         sticky: true,
       });
     }
-
     layer.setStyle({
-      weight: 5,
-      color: setColor(feature),
-      fillOpacity: 0.5,
+      weight: 3,
+      color: color,
+      fillOpacity: 1,
     });
   }
 
@@ -44,22 +47,57 @@ const Map = ({
       (route) => route.route === feature.properties.ROUTE
     );
 
-    if (!matchingRoute) {
-      console.warn(
-        `No matching route found for feature with ROUTE: ${feature.properties.ROUTE}`
-      );
-      return "#000";
+    if (!matchingRoute || !matchingRoute.percentChange) return;
+
+    // This heatmap is derived from the colorblind-friendly "Sunset" color scheme
+    // https://personal.sron.nl/~pault/
+    const percentChange = parseFloat(matchingRoute.percentChange);
+    switch (true) {
+      case percentChange >= 90:
+        return "#364B9A";
+      case percentChange >= 80:
+        return "#4063A8";
+      case percentChange >= 70:
+        return "#4A7BB7";
+      case percentChange >= 60:
+        return "#5C90C2";
+      case percentChange >= 50:
+        return "#6EA6CD";
+      case percentChange >= 40:
+        return "#83B8D7";
+      case percentChange >= 30:
+        return "#98CAE1";
+      case percentChange >= 20:
+        return "#ADD7E8";
+      case percentChange >= 10:
+        return "#C2E4EF";
+      case percentChange > 0:
+        return "#D6E8DD";
+      case percentChange < -90:
+        return "#A50026";
+      case percentChange < -80:
+        return "#C11E29";
+      case percentChange < -70:
+        return "#DD3D2D";
+      case percentChange < -60:
+        return "#E95D3C";
+      case percentChange < -50:
+        return "#F67E4B";
+      case percentChange < -40:
+        return "#F99858";
+      case percentChange < -30:
+        return "#FDB366";
+      case percentChange < -20:
+        return "#FDC678";
+      case percentChange < -10:
+        return "#FEDA8B";
+      case percentChange < 0:
+        return "#F4E3AB";
+      case percentChange == 0:
+        return "#EAECCC";
+      default:
+        return "#FFFFFF";
     }
-
-    const { percentChange } = matchingRoute;
-    const factor = Math.abs(parseFloat(percentChange)) / 100;
-
-    const red = Math.round(255 * (1 - factor));
-    const blue = Math.round(255 * factor);
-    console.log(red, blue);
-    console.log(red.toString(16), blue.toString(16));
-
-    return `#${red.toString(16)}${20}${blue.toString(16)}`;
   }
 
   return (

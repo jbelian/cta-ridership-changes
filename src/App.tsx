@@ -7,7 +7,7 @@ import { parseBusData } from "./busData.tsx";
 
 const App = () => {
   const [selectedDate1, setSelectedDate1] = useState("2001-01");
-  const [selectedDate2, setSelectedDate2] = useState("2023-05");
+  const [selectedDate2, setSelectedDate2] = useState("2001-01");
   const [key, setKey] = useState(`${selectedDate1}-${selectedDate2}`);
 
   const handleDateChange = (
@@ -16,6 +16,7 @@ const App = () => {
   ) => {
     setter(event.target.value);
     setKey(`${selectedDate1}-${selectedDate2}`);
+    console.log("test");
   };
 
   const filteredRoutes = parseBusData(selectedDate1, selectedDate2);
