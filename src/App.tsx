@@ -7,8 +7,10 @@ import { parseBusData } from "./busData.tsx";
 
 const App = () => {
   const [selectedDate1, setSelectedDate1] = useState("2001-01");
-  const [selectedDate2, setSelectedDate2] = useState("2001-01");
-  const [key, setKey] = useState(`${selectedDate1}-${selectedDate2}`);
+  const [selectedDate2, setSelectedDate2] = useState("2023-06");
+  const [key, setKey] = useState(
+    `${selectedDate1}-${selectedDate2}-${Date.now()}`
+  );
 
   const handleDateChange = (
     event: React.ChangeEvent<HTMLInputElement>,
