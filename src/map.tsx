@@ -25,8 +25,7 @@ const Map = ({
   function onEachFeature(feature: Feature<Geometry, any>, layer: any) {
     const color = setColor(feature);
     layer.bindPopup(
-      `Route ${feature.properties.ROUTE}
-      <br/>Color ${color?.toUpperCase()}`
+      `Route ${feature.properties.ROUTE}`
     );
     if (feature.properties) {
       const { Name, NAME2 } = feature.properties;

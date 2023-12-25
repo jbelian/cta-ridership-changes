@@ -18,7 +18,6 @@ const App = () => {
   ) => {
     setter(event.target.value);
     setKey(`${selectedDate1}-${selectedDate2}`);
-    console.log("test");
   };
 
   const filteredRoutes = parseBusData(selectedDate1, selectedDate2);
