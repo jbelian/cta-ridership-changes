@@ -9,6 +9,7 @@ interface RouteSelectionProps {
   onDateChange1: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onDateChange2: (event: React.ChangeEvent<HTMLInputElement>) => void;
   filteredRoutes: CombinedRoutes[];
+
 }
 
 function RouteSelection(props: RouteSelectionProps) {
@@ -17,7 +18,7 @@ function RouteSelection(props: RouteSelectionProps) {
     selectedDate2,
     onDateChange1,
     onDateChange2,
-    filteredRoutes,
+    filteredRoutes
   } = props;
 
   const getYearAndMonthName = (dateString: string) => {
@@ -30,6 +31,7 @@ function RouteSelection(props: RouteSelectionProps) {
   };
 
   return (
+
     <div>
       <label>
         Select years and months to compare
@@ -38,6 +40,8 @@ function RouteSelection(props: RouteSelectionProps) {
             <input
               name="date"
               type="month"
+              min="2001-01"
+              max="2023-06"
               value={selectedDate}
               onChange={(event) =>
                 index === 0 ? onDateChange1(event) : onDateChange2(event)
