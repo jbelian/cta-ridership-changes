@@ -9,7 +9,6 @@ interface RouteSelectionProps {
   onDateChange1: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onDateChange2: (event: React.ChangeEvent<HTMLInputElement>) => void;
   filteredRoutes: CombinedRoutes[];
-
 }
 
 function RouteSelection(props: RouteSelectionProps) {
@@ -29,9 +28,7 @@ function RouteSelection(props: RouteSelectionProps) {
     }).format(date);
     return `${monthName} ${year}`;
   };
-
   return (
-
     <div>
       <label>
         Select years and months to compare

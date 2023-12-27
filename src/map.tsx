@@ -52,50 +52,28 @@ const Map = ({
     // https://personal.sron.nl/~pault/
     const percentChange = parseFloat(matchingRoute.percentChange);
     switch (true) {
-      case percentChange >= 90:
-        return "#364B9A";
-      case percentChange >= 80:
-        return "#4063A8";
-      case percentChange >= 70:
-        return "#4A7BB7";
-      case percentChange >= 60:
-        return "#5C90C2";
-      case percentChange >= 50:
-        return "#6EA6CD";
-      case percentChange >= 40:
-        return "#83B8D7";
-      case percentChange >= 30:
-        return "#98CAE1";
-      case percentChange >= 20:
-        return "#ADD7E8";
-      case percentChange >= 10:
-        return "#C2E4EF";
-      case percentChange > 0:
-        return "#D6E8DD";
-      case percentChange < -90:
-        return "#A50026";
-      case percentChange < -80:
-        return "#C11E29";
-      case percentChange < -70:
-        return "#DD3D2D";
-      case percentChange < -60:
-        return "#E95D3C";
-      case percentChange < -50:
-        return "#F67E4B";
-      case percentChange < -40:
-        return "#F99858";
-      case percentChange < -30:
-        return "#FDB366";
-      case percentChange < -20:
-        return "#FDC678";
-      case percentChange < -10:
-        return "#FEDA8B";
-      case percentChange < 0:
-        return "#F4E3AB";
-      case percentChange == 0:
-        return "#EAECCC";
-      default:
-        return "#FFFFFF";
+      case percentChange >= 90: return "#364B9A";
+      case percentChange >= 80: return "#4063A8";
+      case percentChange >= 70: return "#4A7BB7";
+      case percentChange >= 60: return "#5C90C2";
+      case percentChange >= 50: return "#6EA6CD";
+      case percentChange >= 40: return "#83B8D7";
+      case percentChange >= 30: return "#98CAE1";
+      case percentChange >= 20: return "#ADD7E8";
+      case percentChange >= 10: return "#C2E4EF";
+      case percentChange > 0: return "#D6E8DD";
+      case percentChange < -90: return "#A50026";
+      case percentChange < -80: return "#C11E29";
+      case percentChange < -70: return "#DD3D2D";
+      case percentChange < -60: return "#E95D3C";
+      case percentChange < -50: return "#F67E4B";
+      case percentChange < -40: return "#F99858";
+      case percentChange < -30: return "#FDB366";
+      case percentChange < -20: return "#FDC678";
+      case percentChange < -10: return "#FEDA8B";
+      case percentChange < 0: return "#F4E3AB";
+      case percentChange == 0: return "#EAECCC";
+      default: return "#FFFFFF";
     }
   }
 
