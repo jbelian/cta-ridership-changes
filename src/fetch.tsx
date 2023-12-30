@@ -3,7 +3,8 @@ import { ctaToken } from "./token.tsx";
 export const fetchData = async () => {
     try {
         const response = await fetch(
-            `https://data.cityofchicago.org/resource/bynn-gwxy.json?$limit=50000&$$app_token=${ctaToken}`
+            // `https://data.cityofchicago.org/resource/bynn-gwxy.json?$limit=50000&$$app_token=${ctaToken}`
+            `https://data.cityofchicago.org/resource/bynn-gwxy.json?$limit=1&$$app_token=${ctaToken}`
         );
 
         if (!response.ok) {
