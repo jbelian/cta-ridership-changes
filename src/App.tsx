@@ -4,9 +4,6 @@ import React, { useState } from "react";
 import RouteSelection from "./busDisplay.tsx";
 import Map from "./map.tsx";
 import { parseBusData } from "./busData.tsx";
-import { fetchData } from "./fetch.tsx";
-
-fetchData()
 
 const App = () => {
   const [selectedDate1, setSelectedDate1] = useState("2001-01");
