@@ -1,8 +1,8 @@
 {
-  "name": "cta-trends",
+  "name": "cta-ridership-changes",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://jbelian.github.io/cta-trends/",
+  "homepage": "https://jbelian.github.io/cta-ridership-changes/",
   "type": "module",
   "scripts": {
     "dev": "vite",
