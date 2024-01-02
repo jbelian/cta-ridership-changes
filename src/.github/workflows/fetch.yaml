@@ -14,7 +14,7 @@ jobs:
 
       - name: Download JSON data
         run:
-          API_URL="https://data.cityofchicago.org/resource/bynn-gwxy.json?$limit=3"
+          API_URL=https://data.cityofchicago.org/resource/bynn-gwxy.json?$limit=3
           curl -sSL -o data.json API_URL
           
       - name: Commit JSON data
