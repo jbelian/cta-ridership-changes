@@ -25,8 +25,5 @@ if last_modified != response.headers.get('Last-Modified'):
     bus_data = client.get(resource, limit=50000)
     with open(bus_data_path, 'w') as f:
         json.dump(bus_data, f)
-    with open(bus_data_path, 'w') as f:
+    with open(last_modified_path, 'w') as f:
         f.write(response.headers.get('Last-Modified'))
-
-with open('src/data/bus_data.json', 'w') as f:
-    json.dump(bus_data, f)
