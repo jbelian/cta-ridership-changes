@@ -9,8 +9,8 @@ token = os.getenv('SOCRATA_TOKEN')
 client = Socrata(domain, token)
 bus_data = client.get("bynn-gwxy", limit=50000)
 
-last_modified_path = '.github/workflows/last_modified.txt'
-bus_data_path = 'src/data/bus_data.json'
+last_modified_path = '.github/workflows/lastModified.txt'
+bus_data_path = 'src/data/busData.json'
 
 try:
     with open(last_modified_path, 'r') as f:
