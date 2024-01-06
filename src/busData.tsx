@@ -1,6 +1,6 @@
 //busData.tsx
 
-import busData from "./data/bus.json";
+import busData from "./data/busData.json";
 
 // Keeping variable names as they are in the incoming JSON file
 export interface Routes {
