@@ -1,0 +1,31 @@
+name: Pull Data from Chicago Data Portal
+on:
+  workflow_dispatch:
+  push:
+  # schedule:
+  #   - cron: '0 0 0 * *'
+permissions:
+  contents: write
+jobs:
+  download-data:
+    runs-on: ubuntu-latest  
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+      - name: Install dependencies
+        run: pip3 install requests sodapy
+      - name: Make API call
+        run: python .github/workflows/access_api.py
+        env:
+          SOCRATA_TOKEN: ${{ secrets.SOCRATA_TOKEN }}
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add results.json
+          git commit -m "automatically fetched update"
+          git push
