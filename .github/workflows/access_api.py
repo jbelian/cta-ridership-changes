@@ -27,6 +27,10 @@ print(response.headers)
 
 if last_modified != response.headers.get('Last-Modified'):
     busData = client.get(resource, limit=limit)
+
+    if not os.path.exists(bus_data_dir):
+        os.makedirs(bus_data_dir)
+
     with open(bus_data_path, 'w') as f:
         json.dump(busData, f)
     with open(last_modified_path, 'w') as f:
