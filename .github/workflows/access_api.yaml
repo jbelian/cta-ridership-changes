@@ -26,6 +26,6 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add src/data/bus_data.json
+          git add src/data/busData.json src/data/last_modified.txt
           git commit -m "automatically fetched update"
           git push

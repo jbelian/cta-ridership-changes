@@ -7,10 +7,11 @@ domain = "data.cityofchicago.org"
 resource = "bynn-gwxy"
 token = os.getenv('SOCRATA_TOKEN')
 client = Socrata(domain, token)
-bus_data = client.get("bynn-gwxy", limit=50000)
+limit = 3
 
-last_modified_path = '.github/workflows/lastModified.txt'
+last_modified_path = 'src/data/last_modified.txt'
 bus_data_path = 'src/data/busData.json'
+bus_data_dir = 'src/data'
 
 try:
     with open(last_modified_path, 'r') as f:
@@ -18,12 +19,20 @@ try:
 except FileNotFoundError:
     last_modified = None
 
-response = requests.head(f"https://{domain}/resource/{resource}.json",
+response = requests.get(f"https://{domain}/resource/{resource}.json",
                          headers={"X-App-Token": token})
 
+print(response)
+print(response.headers)
+
 if last_modified != response.headers.get('Last-Modified'):
-    bus_data = client.get(resource, limit=50000)
+    busData = client.get(resource, limit=limit)
+
+    # Check if the directory exists, if not, create it
+    if not os.path.exists(bus_data_dir):
+        os.makedirs(bus_data_dir)
+
     with open(bus_data_path, 'w') as f:
-        json.dump(bus_data, f)
+        json.dump(busData, f)
     with open(last_modified_path, 'w') as f:
-        f.write(response.headers.get('Last-Modified'))
+        f.write(response.headers.get('Last-Modified')  or '')
