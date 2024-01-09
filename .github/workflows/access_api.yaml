@@ -1,7 +1,6 @@
 name: Pull Data from Chicago Data Portal
 on:
   workflow_dispatch:
-  push:
   schedule:
     - cron: '0 0 * * *'
 permissions:
@@ -12,24 +11,50 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
+        
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.11
+          python-version: '3.10'
+
       - name: Install dependencies
         run: pip3 install requests sodapy
-      - name: Make API call
+
+      - name: Run initial Python script
         run: python .github/workflows/access_api.py
         env:
           SOCRATA_TOKEN: ${{ secrets.SOCRATA_TOKEN }}
+
+      - name: Stage files and check for changes
+        run: |
+          git add src/data/bus.json src/data/last_modified.txt
+          if git diff --staged --quiet; then
+            echo 'staged=false' >> $GITHUB_ENV
+          else
+            echo 'staged=true' >> $GITHUB_ENV
+          fi
+
+      - name: Install GDAL dependencies and run second script
+        if: env.staged == 'true'
+        run: |
+          sudo apt-get install libgdal-dev
+          pip3 install GDAL==3.4.1
+          python .github/workflows/kmz_to_json.py
+
+      - name: Stage files and check for changes
+        if: env.staged == 'true'
+        run: |
+          git add src/data/map.json
+          if git diff --staged --quiet; then
+            echo 'staged=false' >> $GITHUB_ENV
+          else
+            echo 'staged=true' >> $GITHUB_ENV
+          fi
+
       - name: Commit and push changes
+        if: env.staged == 'true'
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add src/data/busData.json src/data/last_modified.txt
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "automatically fetched update"
-            git push
-          fi
+          git commit -m "automatically fetched update"
+          git push
