@@ -5,7 +5,7 @@ import { Feature, FeatureCollection, Geometry } from "geojson";
 import "leaflet/dist/leaflet.css";
 import "./App.css";
 import { jawgToken } from "./token.tsx";
-import doc from "./data/doc.json";
+import doc from "../data/map.json";
 import { CombinedRoutes } from "./busData.tsx";
 
 const Map = ({
