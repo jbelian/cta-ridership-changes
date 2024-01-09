@@ -16,4 +16,4 @@ kml_ds = kml_driver.Open('temp.kml')
 
 # Though GeoJSON, the file extension must be .json for later manipulation
 geojson_driver = ogr.GetDriverByName('GeoJSON')
-geojson_driver.CopyDataSource(kml_ds, 'src/data/map.json')
+geojson_driver.CopyDataSource(kml_ds, 'data/map.json')

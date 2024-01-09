@@ -27,7 +27,7 @@ jobs:
 
       - name: Stage files and check for changes
         run: |
-          git add src/data/bus.json src/data/last_modified.txt
+          git add data/bus.json data/last_modified.txt
           if git diff --staged --quiet; then
             echo 'staged=false' >> $GITHUB_ENV
           else
@@ -44,7 +44,7 @@ jobs:
       - name: Stage files and check for changes
         if: env.staged == 'true'
         run: |
-          git add src/data/map.json
+          git add data/map.json
           if git diff --staged --quiet; then
             echo 'staged=false' >> $GITHUB_ENV
           else
