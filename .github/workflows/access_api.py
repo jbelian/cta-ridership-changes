@@ -19,9 +19,16 @@ try:
         last_modified = f.read().strip()
 except FileNotFoundError:
     last_modified = None
-if last_modified != response.headers.get('Last-Modified'):
 
+response_lm = response.headers.get('Last-Modified')
+if last_modified != response_lm:
+    last_modified = response_lm
+    
+    data = client.get('bynn-gwxy', limit=100000)
     with open('data/bus.json', 'w') as f:
-        json.dump(client.get('bynn-gwxy', limit=100000), f)
+        json.dump(data, f)
+
+    last_month = max([item['month_beginning'][:7] for item in data])
     with open('data/last_modified.txt', 'w') as f:
-        f.write(response.headers.get('Last-Modified') or '')
+        f.write((f"{last_modified or ''}"
+                 f"\n{last_month}"))
