@@ -34,8 +34,10 @@ function RouteSelection(props: RouteSelectionProps) {
         console.log('Fetched data:', data);
         const lines = data.split('\n').map(line => line.replace('\r', ''));
         console.log('Parsed lines:', lines);
+        const lastFetchedGMT = new Date(lines[2].slice(-29));
+        const lastFetchedChicago = lastFetchedGMT.toLocaleString('en-US', { timeZone: 'America/Chicago' });
+        setLastFetched(lastFetchedChicago);
         setLastMonth(lines[1].slice(-7));
-        setLastFetched(lines[2]);
       })
       .catch(error => {
         console.error('Fetch error:', error);
@@ -53,7 +55,7 @@ function RouteSelection(props: RouteSelectionProps) {
 
   return (
     <div>
-      <pre>{lastFetched}</pre>
+      <pre>Data last fetched: {lastFetched} (Chicago) ✨</pre>
       <label>
         Select years and months to compare:
         {[selectedDate1, selectedDate2].map((selectedDate, index) => (
