@@ -5,7 +5,7 @@ import { Feature, FeatureCollection, Geometry } from "geojson";
 import "leaflet/dist/leaflet.css";
 import "./App.css";
 import { jawgToken } from "./token.tsx";
-import doc from "../data/map.json";
+import map from "../data/map.json";
 import { CombinedRoutes } from "./busData.tsx";
 
 const Map = ({
@@ -17,7 +17,7 @@ const Map = ({
 }) => {
   const matchingRoutes = {
     type: "FeatureCollection",
-    features: doc.features.filter((feature) =>
+    features: map.features.filter((feature) =>
       filteredRoutes.some((route) => route.route === feature.properties.ROUTE)
     ),
   } as FeatureCollection;
