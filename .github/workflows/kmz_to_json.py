@@ -12,7 +12,7 @@ kmz = zipfile.ZipFile('temp.kmz', 'r')
 kml = kmz.open('doc.kml', 'r').read()
 
 # Parse the KML with BeautifulSoup
-soup = BeautifulSoup(kml, 'lxml')
+soup = BeautifulSoup(kml, 'xml')
 
 # Find all the elements that contain HTML and remove them
 for tag in soup.find_all():
