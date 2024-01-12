@@ -37,8 +37,9 @@ jobs:
       - name: Install GDAL dependencies and run second script
         if: env.staged == 'true'
         run: |
-          sudo apt-get install libgdal-dev
-          pip3 install GDAL==3.4.1
+          sudo apt-get update
+          sudo apt-get install -y libgdal-dev gdal-bin
+          pip3 install GDAL==3.4.1 bs4
           python .github/workflows/kmz_to_json.py
 
       - name: Stage files and check for changes

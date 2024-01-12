@@ -26,11 +26,19 @@ function RouteSelection(props: RouteSelectionProps) {
   const [lastFetched, setLastFetched] = useState('');
   useEffect(() => {
     fetch('../data/last_modified.txt')
-      .then(response => response.text())
+      .then(response => {
+        console.log('Fetch response:', response);
+        return response.text();
+      })
       .then(data => {
+        console.log('Fetched data:', data);
         const lines = data.split('\n').map(line => line.replace('\r', ''));
+        console.log('Parsed lines:', lines);
         setLastMonth(lines[1].slice(-7));
         setLastFetched(lines[2]);
+      })
+      .catch(error => {
+        console.error('Fetch error:', error);
       });
   }, []);
 
