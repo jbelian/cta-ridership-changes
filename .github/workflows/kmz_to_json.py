@@ -33,7 +33,13 @@ for feature in data['features']:
             if len(cells) == 2:
                 prop = cells[0].get_text().strip()
                 value = cells[1].get_text().strip()
-                feature['properties'][prop] = value
+                if prop in ["Name", "ROUTE", "NAME", "SHAPE.LEN"]:
+                    feature['properties'][prop] = value
+
+    # Remove unwanted properties
+    unwanted_props = [prop for prop in feature['properties'] if prop not in ["Name", "ROUTE", "NAME", "SHAPE.LEN"]]
+    for prop in unwanted_props:
+        del feature['properties'][prop]
 
 # Write the cleaned data back to the file
 with open('data/map.json', 'w') as f:
