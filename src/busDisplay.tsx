@@ -27,15 +27,21 @@ function RouteSelection(props: RouteSelectionProps) {
   useEffect(() => {
     fetch('https://raw.githubusercontent.com/jbelian/cta-ridership-changes/main/data/last_modified.txt')
       .then(response => {
-        console.log('Fetch response:', response);
         return response.text();
       })
       .then(data => {
-        console.log('Fetched data:', data);
         const lines = data.split('\n').map(line => line.replace('\r', ''));
-        console.log('Parsed lines:', lines);
         const lastFetchedGMT = new Date(lines[2].slice(-29));
-        const lastFetchedChicago = lastFetchedGMT.toLocaleString('en-US', { timeZone: 'America/Chicago' });
+        const lastFetchedChicago = lastFetchedGMT.toLocaleString('en-US', {
+          timeZone: 'America/Chicago',
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: true
+        });
         setLastFetched(lastFetchedChicago);
         setLastMonth(lines[1].slice(-7));
       })
