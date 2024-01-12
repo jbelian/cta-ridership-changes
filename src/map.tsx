@@ -28,9 +28,9 @@ const Map = ({
       `Route ${feature.properties.ROUTE}`
     );
     if (feature.properties) {
-      const { Name, NAME2 } = feature.properties;
+      const { ROUTE, NAME } = feature.properties;
       // layer.bringToFront;
-      layer.bindTooltip(`Route ${Name}<br/>${NAME2}`, {
+      layer.bindTooltip(`Route ${ROUTE}<br/>${NAME}`, {
         sticky: true,
       });
     }
