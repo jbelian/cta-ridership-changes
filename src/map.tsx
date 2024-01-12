@@ -24,16 +24,9 @@ const Map = ({
 
   function onEachFeature(feature: Feature<Geometry, any>, layer: any) {
     const color = setColor(feature);
-    layer.bindPopup(
-      `Route ${feature.properties.ROUTE}`
-    );
-    if (feature.properties) {
-      const { ROUTE, NAME } = feature.properties;
-      // layer.bringToFront;
-      layer.bindTooltip(`Route ${ROUTE}<br/>${NAME}`, {
-        sticky: true,
-      });
-    }
+    const { ROUTE, NAME } = feature.properties;
+
+    layer.bindTooltip(`Route ${ROUTE}<br/>${NAME}`, { sticky: true, direction: 'auto' });
     layer.setStyle({
       weight: 3,
       color: color,
