@@ -42,6 +42,14 @@ function RouteSelection(props: RouteSelectionProps) {
       });
   }, []);
 
+  const [text, setText] = useState('');
+  useEffect(() => {
+    fetch('../data/last_modified.txt')
+      .then(response => response.text())
+      .then(data => setText(data));
+  }, []);
+  console.log(text);
+
   const getYearAndMonthName = (dateString: string) => {
     const date = new Date(`${dateString}T00:00:00`);
     const year = date.getFullYear();
@@ -53,7 +61,8 @@ function RouteSelection(props: RouteSelectionProps) {
 
   return (
     <div>
-      <pre>{lastFetched}</pre>
+      <p>{lastFetched}</p>
+      <pre>{text}</pre>
       <label>
         Select years and months to compare:
         {[selectedDate1, selectedDate2].map((selectedDate, index) => (
