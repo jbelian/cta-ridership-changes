@@ -62,9 +62,13 @@ jobs:
           git commit -m "automatically fetched update"
           git push origin test-branch
 
-      - name: Build and deploy project
-        if: env.staged == 'true'
+      - name: Build and deploy
+        env:
+          CTA_TOKEN: ${{ secrets.CTA_TOKEN }}
+          JAWG_TOKEN: ${{ secrets.JAWG_TOKEN }}
         run: |
+          echo "REACT_APP_CTA_TOKEN=$CTA_TOKEN" > .env
+          echo "REACT_APP_JAWG_TOKEN=$JAWG_TOKEN" >> .env
           npm install
           npm run build
           npm run deploy
