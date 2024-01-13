@@ -1,19 +1,38 @@
 import os
 import json
-import requests
 from sodapy import Socrata
 
 # API info for bus ridership data
 os.makedirs('data', exist_ok=True)
 domain = "data.cityofchicago.org"
-token = os.getenv('SOCRATA_TOKEN')
-client = Socrata(domain, token)
-response = requests.get(f"https://{domain}/resource/bynn-gwxy.json",
-                         headers={"X-App-Token": token})
+socrata_token = os.getenv('SOCRATA_TOKEN')
+client = Socrata(domain, socrata_token)
+response = client.get("bynn-gwxy", limit=1)
 
 print(response)
 print(response.headers)
 
+
+# Update the Gist with the time of the fetch
+gist_id = "cfe1d1c07128822245c55596e7e60971"
+gist_update_token = os.getenv("GIST_UPDATE_TOKEN")
+headers = {
+    "Authorization": f"token {gist_update_token}",
+    "Accept": "application/vnd.github.v3+json",
+}
+data = {
+    "files": {
+        "lastFetched.txt": {
+            "content": response.headers.get('Date')
+        }
+    }
+}
+
+response = requests.patch(f"https://api.github.com/gists/{gist_id}", headers=headers, json=data)
+response.raise_for_status()
+
+
+# Read the last modified date from lastModified.json
 try:
     with open('data/lastModified.json', 'r') as f:
         data = json.load(f)
@@ -21,7 +40,7 @@ try:
 except FileNotFoundError:
     last_modified = None
 
-# If the header's 'Last-Modified' value hasn't changed, then this workflow ends here
+# If the API header's 'Last-Modified' value hasn't changed, then this workflow ends here
 response_lm = response.headers.get('Last-Modified')
 if last_modified != response_lm:
     last_modified = response_lm
@@ -31,12 +50,13 @@ if last_modified != response_lm:
     with open('data/bus.json', 'w') as f:
         json.dump(data, f)
 
-    # The most recent month will be used as the end date in the date selector
+    # That data's most recent month is used as the end date in the date selector
     last_month = max([item['month_beginning'][:7] for item in data])
-    last_fetch = response.headers.get('Date')
+
+    # Write lastModified and lastMonth to lastModified.json
+    # If these are updated, app will be re-deployed
     with open('data/lastModified.json', 'w') as f:
         json.dump({
-            "lastFetched": last_fetch or '',
             "lastModified": last_modified or '',
             "lastMonth": last_month
         }, f)
