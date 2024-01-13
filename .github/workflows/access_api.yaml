@@ -66,4 +66,5 @@ jobs:
           echo "REACT_APP_JAWG_TOKEN=$JAWG_TOKEN" > .env
           npm install
           npm run build
+          echo "machine github.com login $GITHUB_TOKEN" > ~/.netrc
           npm run deploy
