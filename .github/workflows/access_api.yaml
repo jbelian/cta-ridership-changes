@@ -56,15 +56,16 @@ jobs:
           git commit -m "automatically fetched update"
           git push origin test-branch
 
-      - name: Build and deploy
-        env:
-          JAWG_TOKEN: ${{ secrets.JAWG_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git config user.email "${{ github.actor }}@users.noreply.github.com"
-          git config user.name "GitHub Action"
-          echo "REACT_APP_JAWG_TOKEN=$JAWG_TOKEN" > .env
-          npm install
-          npm run build
-          echo "machine github.com login $GITHUB_TOKEN" > ~/.netrc
-          npm run deploy
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14' # Or your preferred Node.js version
+
+      - name: Install dependencies
+        run: npm ci # Or npm install, if you prefer
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy
+        run: npm run deploy
