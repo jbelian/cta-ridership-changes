@@ -1,4 +1,4 @@
-// busDisplay.tsx
+// routeList.tsx
 
 import { CombinedRoutes } from "./busData.tsx";
 
