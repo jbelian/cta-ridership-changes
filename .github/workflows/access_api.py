@@ -1,5 +1,6 @@
 import os
 import json
+import requests
 from sodapy import Socrata
 
 # API info for bus ridership data
@@ -7,8 +8,8 @@ os.makedirs('data', exist_ok=True)
 domain = "data.cityofchicago.org"
 socrata_token = os.getenv('SOCRATA_TOKEN')
 client = Socrata(domain, socrata_token)
-response = client.get("bynn-gwxy", limit=1)
-
+response = requests.get(f"https://{domain}/resource/bynn-gwxy.json",
+                         headers={"X-App-Token": token})
 print(response)
 print(response.headers)
 
