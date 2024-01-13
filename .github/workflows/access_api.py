@@ -9,7 +9,7 @@ domain = "data.cityofchicago.org"
 socrata_token = os.getenv('SOCRATA_TOKEN')
 client = Socrata(domain, socrata_token)
 response = requests.get(f"https://{domain}/resource/bynn-gwxy.json",
-                         headers={"X-App-Token": token})
+                         headers={"X-App-Token": socrata_token})
 print(response)
 print(response.headers)
 
