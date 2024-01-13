@@ -10,14 +10,12 @@ const App = () => {
   // State variable for storing the fetched data
   const [lastFetchedChicago, setLastFetchedChicago] = useState("");
 
-  // Fetch the data when the component mounts
+  // Last time a fetch was made to update data (in Chi's timezone)
   useEffect(() => {
     const fetchData = async () => {
       const response = await fetch('https://raw.githubusercontent.com/jbelian/'
         + 'cta-ridership-changes/main/data/last_fetched.txt');
       const data = await response.text();
-      console.log(data)
-      // Convert the fetched data to a date and format it
       const lastFetchedGMT = new Date(data);
       const formattedDate = lastFetchedGMT.toLocaleString('en-US', {
         timeZone: 'America/Chicago',
@@ -47,6 +45,7 @@ const App = () => {
   // Filtered routes sent to both the route list and map
   const filteredRoutes = parseBusData(selectedDate1, selectedDate2);
 
+  // Handler for date selector
   const dateChangeHandler = (setter: React.Dispatch<React.SetStateAction<string>>) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setter(event.target.value);
