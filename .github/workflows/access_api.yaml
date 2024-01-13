@@ -59,14 +59,11 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git commit -m "automatically fetched update"
-          git push
+          git push origin main
 
       - name: Build and deploy project
         if: env.staged == 'true'
         run: |
           npm install
           npm run build
-          git checkout -b gh-pages
-          git add -f dist
-          git commit -m "deployed"
-          git push origin gh-pages
+          npm run deploy
