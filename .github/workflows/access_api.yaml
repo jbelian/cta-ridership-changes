@@ -68,8 +68,12 @@ jobs:
           git config user.email "${{ github.actor }}@users.noreply.github.com"
           git config user.name "${{ github.actor }}"
           git add package-lock.json package.json
-          git commit -m "updated"
-          git push origin test-branch
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "updated"
+            git push origin test-branch
+          fi
 
       - name: Build
         run: npm run build
