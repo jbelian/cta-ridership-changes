@@ -50,7 +50,7 @@ jobs:
       - name: Commit and push changes
         if: env.staged == 'true'
         run: |
-          git config --global user.email "action@github.com"
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
           git config --global user.name "GitHub Action"
           git checkout test-branch
           git commit -m "automatically fetched update"
