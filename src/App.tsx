@@ -47,9 +47,6 @@ const App = () => {
       setKey(`${selectedDate1}-${selectedDate2}`);
     };
 
-  const onDateChange1 = dateChangeHandler(setSelectedDate1);
-  const onDateChange2 = dateChangeHandler(setSelectedDate2);
-
   return (
     <div className="container">
       <aside className="sidebar">
@@ -64,7 +61,9 @@ const App = () => {
                 min="2001-01"
                 max={lastMonth}
                 value={selectedDate}
-                onChange={index === 0 ? onDateChange1 : onDateChange2}
+                onChange={index === 0 ?
+                  dateChangeHandler(setSelectedDate1) :
+                  dateChangeHandler(setSelectedDate2)}
               />
             </div>
           ))}
