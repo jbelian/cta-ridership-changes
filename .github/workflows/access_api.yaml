@@ -23,6 +23,7 @@ jobs:
       - name: Run initial Python script
         run: python .github/workflows/access_api.py
         env:
+          GIST_UPDATE_TOKEN: ${{ secrets.GIST_UPDATE_TOKEN }}
           SOCRATA_TOKEN: ${{ secrets.SOCRATA_TOKEN }}
 
       - name: Stage files and check for changes
