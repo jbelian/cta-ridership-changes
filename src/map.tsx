@@ -8,13 +8,8 @@ import { jawgToken } from "./token.tsx";
 import map from "../data/map.json";
 import { CombinedRoutes } from "./busData.tsx";
 
-const Map = ({
-  filteredRoutes,
-  keyProp,
-}: {
-  filteredRoutes: CombinedRoutes[];
-  keyProp: string;
-}) => {
+const Map = ({ filteredRoutes, keyProp }:
+  { filteredRoutes: CombinedRoutes[]; keyProp: string }) => {
   const matchingRoutes = {
     type: "FeatureCollection",
     features: map.features.filter((feature) =>
