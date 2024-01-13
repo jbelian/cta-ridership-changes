@@ -58,9 +58,9 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git checkout main
+          git checkout test-branch
           git commit -m "automatically fetched update"
-          git push origin main
+          git push origin test-branch
 
       - name: Build and deploy project
         if: env.staged == 'true'
