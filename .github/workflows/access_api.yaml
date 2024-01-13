@@ -9,7 +9,6 @@ jobs:
   download-data:
     runs-on: ubuntu-latest  
     steps:
-      - name: Set up environment variables
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GIST_UPDATE_TOKEN: ${{ secrets.GIST_UPDATE_TOKEN }}
