@@ -43,32 +43,24 @@ jobs:
           pip3 install GDAL==3.4.1 bs4
           python .github/workflows/kmz_to_json.py
 
-      - name: Stage files and check for changes
+      - name: Stage map file
         if: env.staged == 'true'
-        run: |
-          git add data/map.json
-          if git diff --staged --quiet; then
-            echo 'staged=false' >> $GITHUB_ENV
-          else
-            echo 'staged=true' >> $GITHUB_ENV
-          fi
+        run: git add data/map.json
 
       - name: Commit and push changes
         if: env.staged == 'true'
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
           git checkout test-branch
           git commit -m "automatically fetched update"
           git push origin test-branch
 
       - name: Build and deploy
         env:
-          CTA_TOKEN: ${{ secrets.CTA_TOKEN }}
           JAWG_TOKEN: ${{ secrets.JAWG_TOKEN }}
         run: |
-          echo "REACT_APP_CTA_TOKEN=$CTA_TOKEN" > .env
-          echo "REACT_APP_JAWG_TOKEN=$JAWG_TOKEN" >> .env
+          echo "REACT_APP_JAWG_TOKEN=$JAWG_TOKEN" > .env
           npm install
           npm run build
           npm run deploy
