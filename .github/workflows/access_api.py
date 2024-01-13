@@ -15,8 +15,9 @@ print(response)
 print(response.headers)
 
 try:
-    with open('data/last_modified.txt', 'r') as f:
-        last_modified = f.readline().replace("Last modified: ", "").strip()
+    with open('data/lastModified.json', 'r') as f:
+        data = json.load(f)
+        last_modified = data.get("Last modified")
 except FileNotFoundError:
     last_modified = None
 
@@ -33,7 +34,9 @@ if last_modified != response_lm:
     # The most recent month will be used as the end date in the date selector
     last_month = max([item['month_beginning'][:7] for item in data])
     last_fetch = response.headers.get('Date')
-    with open('data/last_modified.txt', 'w') as f:
-        f.write((f"Last modified: {last_modified or ''}"
-                 f"\nLast month with data: {last_month}"
-                 f"\nLast fetched:  {last_fetch or ''}"))
+    with open('data/lastModified.json', 'w') as f:
+        json.dump({
+            "lastFetched": last_fetch or '',
+            "lastModified": last_modified or '',
+            "lastMonth": last_month
+        }, f)

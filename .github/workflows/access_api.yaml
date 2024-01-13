@@ -27,7 +27,7 @@ jobs:
 
       - name: Stage files and check for changes
         run: |
-          git add data/bus.json data/last_modified.txt
+          git add data/bus.json data/lastModified.json
           if git diff --staged --quiet; then
             echo 'staged=false' >> $GITHUB_ENV
           else
