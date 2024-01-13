@@ -50,8 +50,8 @@ jobs:
       - name: Commit and push changes
         if: env.staged == 'true'
         run: |
-          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-          git config --global user.name "GitHub Action"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          git config user.name "GitHub Action"
           git checkout test-branch
           git commit -m "automatically fetched update"
           git push origin test-branch
@@ -60,6 +60,8 @@ jobs:
         env:
           JAWG_TOKEN: ${{ secrets.JAWG_TOKEN }}
         run: |
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          git config user.name "GitHub Action"
           echo "REACT_APP_JAWG_TOKEN=$JAWG_TOKEN" > .env
           npm install
           npm run build
