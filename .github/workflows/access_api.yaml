@@ -6,14 +6,12 @@ on:
 permissions:
   contents: write
 jobs:
-- name: Set Environment Variables
-  run: echo "Setting up environment variables"
-  env:
-    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    GIST_UPDATE_TOKEN: ${{ secrets.GIST_UPDATE_TOKEN }}
-    SOCRATA_TOKEN: ${{ secrets.SOCRATA_TOKEN }}
   download-data:
-    runs-on: ubuntu-latest  
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GIST_UPDATE_TOKEN: ${{ secrets.GIST_UPDATE_TOKEN }}
+      SOCRATA_TOKEN: ${{ secrets.SOCRATA_TOKEN }}
     steps:            
       - name: Check GH_TOKEN
         run: |
