@@ -9,21 +9,6 @@ jobs:
   download-data:
     runs-on: ubuntu-latest  
     steps:
-      - name: Set Environment Variables
-        run: echo "Setting up environment variables"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GIST_UPDATE_TOKEN: ${{ secrets.GIST_UPDATE_TOKEN }}
-          SOCRATA_TOKEN: ${{ secrets.SOCRATA_TOKEN }}
-            
-      - name: Check GH_TOKEN
-        run: |
-          if [[ -z "${{ secrets.GH_TOKEN }}" ]]; then
-            echo "GH_TOKEN is not set"
-          else
-            echo "GH_TOKEN is set"
-          fi
-
       - name: Checkout repo
         uses: actions/checkout@v3
         
@@ -37,6 +22,9 @@ jobs:
 
       - name: Run initial Python script
         run: python .github/workflows/access_api.py
+        env:
+          GIST_UPDATE_TOKEN: ${{ secrets.GIST_UPDATE_TOKEN }}
+          SOCRATA_TOKEN: ${{ secrets.SOCRATA_TOKEN }}
 
       - name: Stage files and check for changes
         run: |
@@ -92,3 +80,5 @@ jobs:
       
       - name: Deploy
         run: npm run deploy
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
