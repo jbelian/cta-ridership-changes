@@ -9,6 +9,15 @@ jobs:
   download-data:
     runs-on: ubuntu-latest  
     steps:
+      - name: Set up environment variables
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GIST_UPDATE_TOKEN: ${{ secrets.GIST_UPDATE_TOKEN }}
+          SOCRATA_TOKEN: ${{ secrets.SOCRATA_TOKEN }}
+        
+      - name: Echo GH_TOKEN
+          run: echo ${{ secrets.GH_TOKEN }}
+
       - name: Checkout repo
         uses: actions/checkout@v3
         
@@ -22,9 +31,6 @@ jobs:
 
       - name: Run initial Python script
         run: python .github/workflows/access_api.py
-        env:
-          GIST_UPDATE_TOKEN: ${{ secrets.GIST_UPDATE_TOKEN }}
-          SOCRATA_TOKEN: ${{ secrets.SOCRATA_TOKEN }}
 
       - name: Stage files and check for changes
         run: |
@@ -80,5 +86,3 @@ jobs:
       
       - name: Deploy
         run: npm run deploy
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
