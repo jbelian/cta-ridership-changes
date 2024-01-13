@@ -1,24 +1,38 @@
 // App.tsx
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import RouteSelection from "./routeList.tsx";
 import Map from "./map.tsx";
 import { parseBusData } from "./busData.tsx";
 import lastModified from "../data/lastModified.json";
 
 const App = () => {
-  // For displaying the datetime of the last time the data was fetched
-  const lastFetchedGMT = new Date(lastModified.lastFetched.slice(-29));
-  const lastFetchedChicago = lastFetchedGMT.toLocaleString('en-US', {
-    timeZone: 'America/Chicago',
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: true
-  });
+  // State variable for storing the fetched data
+  const [lastFetchedChicago, setLastFetchedChicago] = useState("");
+
+  // Fetch the data when the component mounts
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await fetch('https://raw.githubusercontent.com/jbelian/'
+        + 'cta-ridership-changes/main/data/last_fetched.txt');
+      const data = await response.text();
+      console.log(data)
+      // Convert the fetched data to a date and format it
+      const lastFetchedGMT = new Date(data);
+      const formattedDate = lastFetchedGMT.toLocaleString('en-US', {
+        timeZone: 'America/Chicago',
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+      });
+      setLastFetchedChicago(formattedDate);
+    };
+    fetchData();
+  }, []);
 
   // The most recent month of data is used as the end date for the date selector
   const lastMonth = lastModified.lastMonthWithData.slice(-7)
