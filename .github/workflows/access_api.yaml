@@ -14,10 +14,14 @@ jobs:
       SOCRATA_TOKEN: ${{ secrets.SOCRATA_TOKEN }}
       REACT_APP_JAWG_TOKEN: ${{ secrets.REACT_APP_JAWG_TOKEN }}
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
       - name: Setup Git
         run: |
           git config user.email "${{ github.actor }}@users.noreply.github.com"
-          git config user.name "GitHub Action"          
+          git config user.name "GitHub Action" 
+
       - name: Check GH_TOKEN
         run: |
           if [[ -z "${GH_TOKEN}" ]]; then
@@ -25,9 +29,6 @@ jobs:
           else
             echo "GH_TOKEN is set"
           fi
-
-      - name: Checkout repo
-        uses: actions/checkout@v3
         
       - name: Set up Python
         uses: actions/setup-python@v4
