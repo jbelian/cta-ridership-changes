@@ -13,7 +13,11 @@ jobs:
       GIST_UPDATE_TOKEN: ${{ secrets.GIST_UPDATE_TOKEN }}
       SOCRATA_TOKEN: ${{ secrets.SOCRATA_TOKEN }}
       REACT_APP_JAWG_TOKEN: ${{ secrets.REACT_APP_JAWG_TOKEN }}
-    steps:            
+    steps:
+      - name: Setup Git
+        run: |
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          git config user.name "GitHub Action"          
       - name: Check GH_TOKEN
         run: |
           if [[ -z "${GH_TOKEN}" ]]; then
@@ -59,8 +63,6 @@ jobs:
       - name: Commit and push changes
         if: env.staged == 'true'
         run: |
-          git config user.email "${{ github.actor }}@users.noreply.github.com"
-          git config user.name "GitHub Action"
           git commit -m "automatically fetched update"
           git push origin
 
