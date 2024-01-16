@@ -74,7 +74,6 @@ jobs:
         run: |
           rm -rf node_modules package-lock.json
           npm install
-          npm install --save-dev gh-pages
           git config user.email "${{ github.actor }}@users.noreply.github.com"
           git config user.name "${{ github.actor }}"
           git add package-lock.json package.json
@@ -93,7 +92,7 @@ jobs:
           if [[ -z "${GH_TOKEN}" ]]; then
             echo "GH_TOKEN is not set"
           else
-            echo "GH_TOKEN is set"
+            echo "GH_TOKEN is set to ${GH_TOKEN:0:4}"
           fi
       
       - name: Deploy
