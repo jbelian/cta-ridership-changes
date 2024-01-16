@@ -14,7 +14,7 @@ const App = () => {
   useEffect(() => {
     const fetchData = async () => {
       const response = await fetch('https://raw.githubusercontent.com/jbelian/'
-        + 'cta-ridership-changes/main/data/last_fetched.txt');
+        + 'cta-ridership-changes/main/data/lastFetched.json');
       const data = await response.text();
       const lastFetchedGMT = new Date(data);
       const formattedDate = lastFetchedGMT.toLocaleString('en-US', {
