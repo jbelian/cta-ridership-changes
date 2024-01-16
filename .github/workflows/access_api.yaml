@@ -86,14 +86,6 @@ jobs:
 
       - name: Build
         run: npm run build
-
-      - name: Check GH_TOKEN
-        run: |
-          if [[ -z "${GH_TOKEN}" ]]; then
-            echo "GH_TOKEN is not set"
-          else
-            echo "GH_TOKEN is set to ${GH_TOKEN:0:4}"
-          fi
       
       - name: Deploy
         run: npm run deploy
