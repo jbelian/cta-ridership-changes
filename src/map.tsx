@@ -4,9 +4,10 @@ import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import { Feature, FeatureCollection, Geometry } from "geojson";
 import "leaflet/dist/leaflet.css";
 import "./App.css";
-import { jawgToken } from "./token.tsx";
 import map from "../data/map.json";
 import { CombinedRoutes } from "./busData.tsx";
+
+const jawgToken = process.env.REACT_APP_JAWG_TOKEN;
 
 const Map = ({ filteredRoutes, keyProp }:
   { filteredRoutes: CombinedRoutes[]; keyProp: string }) => {

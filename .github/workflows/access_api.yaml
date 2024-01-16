@@ -7,8 +7,20 @@ permissions:
   contents: write
 jobs:
   download-data:
-    runs-on: ubuntu-latest  
-    steps:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GIST_UPDATE_TOKEN: ${{ secrets.GIST_UPDATE_TOKEN }}
+      SOCRATA_TOKEN: ${{ secrets.SOCRATA_TOKEN }}
+    steps:            
+      - name: Check GH_TOKEN
+        run: |
+          if [[ -z "${GH_TOKEN}" ]]; then
+            echo "GH_TOKEN is not set"
+          else
+            echo "GH_TOKEN is set"
+          fi
+
       - name: Checkout repo
         uses: actions/checkout@v3
         
@@ -22,8 +34,6 @@ jobs:
 
       - name: Run initial Python script
         run: python .github/workflows/access_api.py
-        env:
-          SOCRATA_TOKEN: ${{ secrets.SOCRATA_TOKEN }}
 
       - name: Stage files and check for changes
         run: |
@@ -42,30 +52,48 @@ jobs:
           pip3 install GDAL==3.4.1 bs4
           python .github/workflows/kmz_to_json.py
 
-      - name: Stage files and check for changes
+      - name: Stage map file
         if: env.staged == 'true'
-        run: |
-          git add data/map.json
-          if git diff --staged --quiet; then
-            echo 'staged=false' >> $GITHUB_ENV
-          else
-            echo 'staged=true' >> $GITHUB_ENV
-          fi
+        run: git add data/map.json
 
       - name: Commit and push changes
         if: env.staged == 'true'
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          git config user.name "GitHub Action"
+          git checkout test-branch
           git commit -m "automatically fetched update"
-          git push
+          git push origin test-branch
 
-      - name: Build and deploy project
-        if: env.staged == 'true'
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install dependencies
         run: |
+          rm -rf node_modules package-lock.json
           npm install
-          npm run build
-          git checkout -b gh-pages
-          git add -f dist
-          git commit -m "deployed"
-          git push origin gh-pages
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          git config user.name "${{ github.actor }}"
+          git add package-lock.json package.json
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "updated"
+            git push origin test-branch
+          fi
+
+      - name: Build
+        run: npm run build
+
+      - name: Check GH_TOKEN
+        run: |
+          if [[ -z "${GH_TOKEN}" ]]; then
+            echo "GH_TOKEN is not set"
+          else
+            echo "GH_TOKEN is set to ${GH_TOKEN:0:4}"
+          fi
+      
+      - name: Deploy
+        run: npm run deploy

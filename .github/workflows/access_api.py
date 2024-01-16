@@ -8,10 +8,10 @@ os.makedirs('data', exist_ok=True)
 domain = "data.cityofchicago.org"
 socrata_token = os.getenv('SOCRATA_TOKEN')
 client = Socrata(domain, socrata_token)
-response = requests.get(f"https://{domain}/resource/bynn-gwxy.json",
+socrata_response = requests.get(f"https://{domain}/resource/bynn-gwxy.json",
                          headers={"X-App-Token": socrata_token})
-print(response)
-print(response.headers)
+print(socrata_response)
+print(socrata_response.headers)
 
 
 # Update the Gist with the time of the fetch
@@ -23,14 +23,14 @@ headers = {
 }
 data = {
     "files": {
-        "lastFetched.txt": {
-            "content": response.headers.get('Date')
+        "lastFetched.json": {
+            "content": socrata_response.headers.get('Date')
         }
     }
 }
 
-response = requests.patch(f"https://api.github.com/gists/{gist_id}", headers=headers, json=data)
-response.raise_for_status()
+gist_response = requests.patch(f"https://api.github.com/gists/{gist_id}", headers=headers, json=data)
+gist_response.raise_for_status()
 
 
 # Read the last modified date from lastModified.json
@@ -42,12 +42,12 @@ except FileNotFoundError:
     last_modified = None
 
 # If the API header's 'Last-Modified' value hasn't changed, then this workflow ends here
-response_lm = response.headers.get('Last-Modified')
+response_lm = socrata_response.headers.get('Last-Modified')
 if last_modified != response_lm:
     last_modified = response_lm
 
     # Download the bus ridership data    
-    data = client.get('bynn-gwxy', limit=100000)
+    data = client.get('bynn-gwxy', limit=1000000)
     with open('data/bus.json', 'w') as f:
         json.dump(data, f)
 

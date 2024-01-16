@@ -33,7 +33,7 @@ const App = () => {
   }, []);
 
   // The most recent month of data is used as the end date for the date selector
-  const lastMonth = lastModified.lastMonthWithData.slice(-7)
+  const lastMonth = lastModified.lastMonth
 
   // Start and end dates for date selector
   const [selectedDate1, setSelectedDate1] = useState("2001-01");
