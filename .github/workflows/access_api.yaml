@@ -12,6 +12,7 @@ jobs:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       GIST_UPDATE_TOKEN: ${{ secrets.GIST_UPDATE_TOKEN }}
       SOCRATA_TOKEN: ${{ secrets.SOCRATA_TOKEN }}
+      REACT_APP_JAWG_TOKEN: ${{ secrets.REACT_APP_JAWG_TOKEN }}
     steps:            
       - name: Check GH_TOKEN
         run: |
