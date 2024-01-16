@@ -23,7 +23,7 @@ headers = {
 }
 data = {
     "files": {
-        "lastFetched.txt": {
+        "lastFetched.json": {
             "content": socrata_response.headers.get('Date')
         }
     }

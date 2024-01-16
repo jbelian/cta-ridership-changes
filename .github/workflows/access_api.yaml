@@ -15,7 +15,7 @@ jobs:
     steps:            
       - name: Check GH_TOKEN
         run: |
-          if [[ -z "${{ secrets.GH_TOKEN }}" ]]; then
+          if [[ -z "${GH_TOKEN}" ]]; then
             echo "GH_TOKEN is not set"
           else
             echo "GH_TOKEN is set"
