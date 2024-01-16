@@ -45,8 +45,7 @@ jobs:
             echo 'staged=true' >> $GITHUB_ENV
           fi
 
-      - name: Install GDAL dependencies and run second script
-        if: env.staged == 'true'
+      - name: Install GDAL and dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y libgdal-dev gdal-bin
@@ -73,10 +72,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          rm -rf node_modules package-lock.json
           npm install
-          git config user.email "${{ github.actor }}@users.noreply.github.com"
-          git config user.name "${{ github.actor }}"
           git add package-lock.json package.json
           if git diff --staged --quiet; then
             echo "No changes to commit"
