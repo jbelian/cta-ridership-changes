@@ -38,15 +38,15 @@ try:
     with open('data/lastModified.json', 'r') as f:
         data = json.load(f)
         last_modified = data.get("lastModified")
-        print("Stored value:", last_modified)
+        print("Current last modified time:", last_modified)
 except FileNotFoundError:
     last_modified = None
 
 # If the API header's 'Last-Modified' value hasn't changed, then this workflow ends here
 response_lm = socrata_response.headers.get('Last-Modified')
 if last_modified == response_lm:
-    print("Fetched value:", response_lm)
-    print("No new data found.")
+    print("Fetched last modified time:", response_lm)
+    print("No new data found, exiting...")
     exit(0)
 
 last_modified = response_lm
