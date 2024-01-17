@@ -2,7 +2,7 @@ name: Pull Data from Chicago Data Portal
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '0 17 * * *'
 permissions:
   contents: write
 jobs:
@@ -22,7 +22,7 @@ jobs:
           git config user.email "${{ github.actor }}@users.noreply.github.com"
           git config user.name "GitHub Action" 
 
-      - name: Check GH_TOKEN
+      - name: Check if Github token is set
         run: |
           if [[ -z "${GH_TOKEN}" ]]; then
             echo "GH_TOKEN is not set"
@@ -33,15 +33,23 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.10.4'
+
+      - name: Cache Python dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
       - name: Install dependencies
         run: pip3 install requests sodapy
 
-      - name: Run initial Python script
+      - name: Call APIs and download any updated files
         run: python .github/workflows/access_api.py
 
-      - name: Stage files and check for changes
+      - name: Stage files if they have updated
         run: |
           git add data/bus.json data/lastModified.json
           if git diff --staged --quiet; then
@@ -50,16 +58,18 @@ jobs:
             echo 'staged=true' >> $GITHUB_ENV
           fi
 
-      - name: Install GDAL and dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libgdal-dev gdal-bin
-          pip3 install GDAL==3.4.1 bs4
-          python .github/workflows/kmz_to_json.py
+      # - name: Install GDAL
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y libgdal-dev gdal-bin
+      #     pip3 install GDAL==3.4.1 bs4
 
-      - name: Stage map file
-        if: env.staged == 'true'
-        run: git add data/map.json
+      # - name: Convert map file from KMZ to GeoJSON
+      #   run: python .github/workflows/kmz_to_json.py
+
+      # - name: Stage map file
+      #   if: env.staged == 'true'
+      #   run: git add data/map.json
 
       - name: Commit and push changes
         if: env.staged == 'true'
@@ -67,24 +77,22 @@ jobs:
           git commit -m "automatically fetched update"
           git push origin
 
-      - name: Setup Node.js environment
+      - name: Set up Node.js environment
         uses: actions/setup-node@v2
-        with:
-          node-version: '14'
 
       - name: Install dependencies
         run: |
           npm install
           git add package-lock.json package.json
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-          else
+          if ! git diff --staged --quiet; then
             git commit -m "updated"
             git push origin
           fi
 
       - name: Build
         run: npm run build
+        if: success()
       
       - name: Deploy
         run: npm run deploy
+        if: success()
