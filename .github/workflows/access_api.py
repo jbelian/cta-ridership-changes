@@ -38,28 +38,32 @@ try:
     with open('data/lastModified.json', 'r') as f:
         data = json.load(f)
         last_modified = data.get("lastModified")
-        print("Current:", last_modified)
+        print("Stored value:", last_modified)
 except FileNotFoundError:
     last_modified = None
 
 # If the API header's 'Last-Modified' value hasn't changed, then this workflow ends here
 response_lm = socrata_response.headers.get('Last-Modified')
-if last_modified != response_lm:
-    last_modified = response_lm
-    print(f"New data found! {last_modified}")
+if last_modified == response_lm:
+    print("Fetched value:", response_lm)
+    print("No new data found.")
+    exit(0)
 
-    # Download the bus ridership data    
-    data = client.get('bynn-gwxy', limit=1000000)
-    with open('data/bus.json', 'w') as f:
-        json.dump(data, f)
+last_modified = response_lm
+print(f"New data found! {last_modified}")
 
-    # That data's most recent month is used as the end date in the date selector
-    last_month = max([item['month_beginning'][:7] for item in data])
+# Download the bus ridership data    
+data = client.get('bynn-gwxy', limit=1000000)
+with open('data/bus.json', 'w') as f:
+    json.dump(data, f)
 
-    # Write lastModified and lastMonth to lastModified.json
-    # If these are updated, app will be re-deployed
-    with open('data/lastModified.json', 'w') as f:
-        json.dump({
-            "lastModified": last_modified or '',
-            "lastMonth": last_month
-        }, f)
+# That data's most recent month is used as the end date in the date selector
+last_month = max([item['month_beginning'][:7] for item in data])
+
+# Write lastModified and lastMonth to lastModified.json
+# If these are updated, app will be re-deployed
+with open('data/lastModified.json', 'w') as f:
+    json.dump({
+        "lastModified": last_modified or '',
+        "lastMonth": last_month
+    }, f)
