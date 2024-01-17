@@ -38,8 +38,7 @@ try:
     with open('data/lastModified.json', 'r') as f:
         data = json.load(f)
         last_modified = data.get("Last modified")
-        print("Current:" +
-              last_modified)
+        print("Current:", last_modified)
 except FileNotFoundError:
     last_modified = None
 
@@ -47,8 +46,7 @@ except FileNotFoundError:
 response_lm = socrata_response.headers.get('Last-Modified')
 if last_modified != response_lm:
     last_modified = response_lm
-    print(f"New data found!" +
-          last_modified)
+    print(f"New data found! {last_modified}")
 
     # Download the bus ridership data    
     data = client.get('bynn-gwxy', limit=1000000)
