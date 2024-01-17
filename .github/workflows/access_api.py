@@ -37,14 +37,21 @@ gist_response.raise_for_status()
 try:
     with open('data/lastModified.json', 'r') as f:
         data = json.load(f)
-        last_modified = data.get("Last modified")
+        last_modified = data.get("lastModified")
+        print("Current last modified time:", last_modified)
 except FileNotFoundError:
     last_modified = None
 
 # If the API header's 'Last-Modified' value hasn't changed, then this workflow ends here
 response_lm = socrata_response.headers.get('Last-Modified')
-if last_modified != response_lm:
+if last_modified == response_lm:
+    print("Fetched last modified time:", response_lm)
+    print("No new data found, exiting...")
+    exit(0)
+
+else:
     last_modified = response_lm
+    print(f"New data found! Time: {last_modified}")
 
     # Download the bus ridership data    
     data = client.get('bynn-gwxy', limit=1000000)
@@ -53,6 +60,7 @@ if last_modified != response_lm:
 
     # That data's most recent month is used as the end date in the date selector
     last_month = max([item['month_beginning'][:7] for item in data])
+    
 
     # Write lastModified and lastMonth to lastModified.json
     # If these are updated, app will be re-deployed

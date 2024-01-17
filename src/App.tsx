@@ -13,8 +13,12 @@ const App = () => {
   // Last time a fetch was made to update data (in Chi's timezone)
   useEffect(() => {
     const fetchData = async () => {
-      const response = await fetch('https://raw.githubusercontent.com/jbelian/'
-        + 'cta-ridership-changes/main/data/lastFetched.json');
+      const response = await fetch(
+        'https://gist.githubusercontent.com/jbelian/' +
+        'cfe1d1c07128822245c55596e7e60971/' +
+        'raw/6943bef389db56bd74cecd51154aac78f514c872/' +
+        'lastFetched.json'
+      );
       const data = await response.text();
       const lastFetchedGMT = new Date(data);
       const formattedDate = lastFetchedGMT.toLocaleString('en-US', {
