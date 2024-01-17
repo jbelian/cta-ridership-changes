@@ -37,7 +37,7 @@ gist_response.raise_for_status()
 try:
     with open('data/lastModified.json', 'r') as f:
         data = json.load(f)
-        last_modified = data.get("Last modified")
+        last_modified = data.get("lastModified")
         print("Current:", last_modified)
 except FileNotFoundError:
     last_modified = None
