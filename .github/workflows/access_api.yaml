@@ -84,11 +84,13 @@ jobs:
         run: |
           npm install
           git add package-lock.json package.json
+          if ! git diff --staged --quiet; then
+            git commit -m "updated"
+            git push
+          fi
 
       - name: Build
         run: npm run build
-        if: success()
       
       - name: Deploy
         run: npm run deploy
-        if: success()
