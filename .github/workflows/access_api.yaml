@@ -75,7 +75,7 @@ jobs:
         if: env.staged == 'true'
         run: |
           git commit -m "automatically fetched update"
-          git push origin
+          git push
 
       - name: Set up Node.js environment
         uses: actions/setup-node@v2
@@ -86,7 +86,7 @@ jobs:
           git add package-lock.json package.json
           if ! git diff --staged --quiet; then
             git commit -m "updated"
-            git push origin
+            git push
           fi
 
       - name: Build
