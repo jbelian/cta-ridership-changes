@@ -9,7 +9,7 @@ jobs:
   download-data:
     runs-on: ubuntu-latest
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_PAT: ${{ secrets.GITHUB_PAT }}
       GIST_UPDATE_TOKEN: ${{ secrets.GIST_UPDATE_TOKEN }}
       SOCRATA_TOKEN: ${{ secrets.SOCRATA_TOKEN }}
       REACT_APP_JAWG_TOKEN: ${{ secrets.REACT_APP_JAWG_TOKEN }}
@@ -24,10 +24,10 @@ jobs:
 
       - name: Check if Github token is set
         run: |
-          if [[ -z "${GITHUB_TOKEN}" ]]; then
-            echo "GITHUB_TOKEN is not set"
+          if [[ -z "${GITHUB_PAT}" ]]; then
+            echo "GITHUB_PAT is not set"
           else
-            echo "GITHUB_TOKEN is set"
+            echo "GITHUB_PAT is set"
           fi
         
       - name: Set up Python
@@ -97,4 +97,4 @@ jobs:
       - name: Deploy
         run: npm run deploy
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_PAT: ${{ secrets.GITHUB_PAT }}
