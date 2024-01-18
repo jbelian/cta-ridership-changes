@@ -1,5 +1,5 @@
-const ghpages = require('gh-pages');
-const path = require('path');
+import ghpages from 'gh-pages';
+import { publish } from 'path';
 
 ghpages.publish(
     'dist',
