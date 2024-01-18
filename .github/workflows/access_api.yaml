@@ -47,8 +47,8 @@ jobs:
         run: pip3 install requests sodapy
 
       - name: Call APIs and download any updated files
-        run: python .github/workflows/access_api.py
-
+        run: python ../scripts/access_api.py
+        
       - name: Stage files if they have updated
         run: |
           git add data/bus.json data/lastModified.json
@@ -65,7 +65,7 @@ jobs:
           pip3 install GDAL==3.4.1 bs4
 
       - name: Convert map file from KMZ to GeoJSON
-        run: python .github/workflows/kmz_to_json.py
+        run: python ../scripts/kmz_to_json.py
 
       - name: Stage map file
         if: env.staged == 'true'
