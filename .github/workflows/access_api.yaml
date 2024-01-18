@@ -60,11 +60,27 @@ jobs:
         if: env.staged == 'true'
         run: python ./scripts/kmz_to_json.py
 
+      - name: Stage map file
+        if: env.staged == 'true'
+        run: git add data/map.json
+
+      - name: Commit and push changes
+        if: env.staged == 'true'
+        run: |
+          git commit -m "automatically fetched update"
+          git push
+
       - name: Set up Node.js environment
         uses: actions/setup-node@v2
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm install
+          git add package-lock.json package.json
+          if ! git diff --staged --quiet; then
+            git commit -m "updated"
+            git push
+          fi
 
       - name: Build
         run: npm run build
