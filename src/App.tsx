@@ -7,20 +7,14 @@ import { parseBusData } from "./busData.tsx";
 import lastModified from "../data/lastModified.json";
 
 const App = () => {
-  // State variable for storing the fetched data
+  // Fetch last date of fetch from gist
   const [lastFetchedChicago, setLastFetchedChicago] = useState("");
-
-  // Last time a fetch was made to update data (in Chi's timezone)
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await fetch(
-        'https://gist.githubusercontent.com/jbelian/' +
-        'cfe1d1c07128822245c55596e7e60971/' +
-        'raw/6943bef389db56bd74cecd51154aac78f514c872/' +
-        'lastFetched.json'
-      );
-      const data = await response.text();
-      const lastFetchedGMT = new Date(data);
+    const fetchGist = async () => {
+      const response = await fetch('https://api.github.com/gists/cfe1d1c07128822245c55596e7e60971');
+      const data = await response.json();
+      const fileContent = data.files['lastFetched.json'].content;
+      const lastFetchedGMT = new Date(fileContent);
       const formattedDate = lastFetchedGMT.toLocaleString('en-US', {
         timeZone: 'America/Chicago',
         day: '2-digit',
@@ -33,7 +27,7 @@ const App = () => {
       });
       setLastFetchedChicago(formattedDate);
     };
-    fetchData();
+    fetchGist();
   }, []);
 
   // The most recent month of data is used as the end date for the date selector
