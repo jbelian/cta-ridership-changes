@@ -6,8 +6,8 @@ ghpages.publish(
         branch: 'gh-pages',
         repo: `https://${process.env.GITHUB_TOKEN}@github.com/jbelian/cta-ridership-changes.git`,
         user: {
-            name: 'jbelian',
-            email: 'jbelian@users.noreply.github.com'
+            name: 'GitHub Actions',
+            email: 'actions@users.noreply.github.com'
         }
     },
     err => {
