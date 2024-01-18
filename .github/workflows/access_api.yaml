@@ -59,12 +59,14 @@ jobs:
           fi
 
       - name: Install GDAL
+        if: env.staged == 'true'
         run: |
           sudo apt-get update
           sudo apt-get install -y libgdal-dev gdal-bin
           pip3 install GDAL==3.4.1 bs4
 
       - name: Convert map file from KMZ to GeoJSON
+        if: env.staged == 'true'
         run: python ./scripts/kmz_to_json.py
 
       - name: Stage map file
@@ -72,7 +74,6 @@ jobs:
         run: git add data/map.json
 
       - name: Commit and push changes
-        if: env.staged == 'true'
         run: |
           git commit -m "automatically fetched update"
           git push
