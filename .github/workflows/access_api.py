@@ -49,21 +49,23 @@ if last_modified == response_lm:
     print("No new data found, exiting...")
     exit(0)
 
-last_modified = response_lm
-print(f"New data found! {last_modified}")
+else:
+    last_modified = response_lm
+    print(f"New data found! Time: {last_modified}")
 
-# Download the bus ridership data    
-data = client.get('bynn-gwxy', limit=1000000)
-with open('data/bus.json', 'w') as f:
-    json.dump(data, f)
+    # Download the bus ridership data    
+    data = client.get('bynn-gwxy', limit=1000000)
+    with open('data/bus.json', 'w') as f:
+        json.dump(data, f)
 
-# That data's most recent month is used as the end date in the date selector
-last_month = max([item['month_beginning'][:7] for item in data])
+    # That data's most recent month is used as the end date in the date selector
+    last_month = max([item['month_beginning'][:7] for item in data])
+    
 
-# Write lastModified and lastMonth to lastModified.json
-# If these are updated, app will be re-deployed
-with open('data/lastModified.json', 'w') as f:
-    json.dump({
-        "lastModified": last_modified or '',
-        "lastMonth": last_month
-    }, f)
+    # Write lastModified and lastMonth to lastModified.json
+    # If these are updated, app will be re-deployed
+    with open('data/lastModified.json', 'w') as f:
+        json.dump({
+            "lastModified": last_modified or '',
+            "lastMonth": last_month
+        }, f)
