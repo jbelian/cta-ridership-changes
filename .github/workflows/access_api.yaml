@@ -9,10 +9,9 @@ jobs:
   download-data:
     runs-on: ubuntu-latest
     env:
-      # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       GIST_UPDATE_TOKEN: ${{ secrets.GIST_UPDATE_TOKEN }}
       SOCRATA_TOKEN: ${{ secrets.SOCRATA_TOKEN }}
-      REACT_APP_JAWG_TOKEN: ${{ secrets.REACT_APP_JAWG_TOKEN }}
+      VITE_APP_JAWG_TOKEN: ${{ secrets.VITE_APP_JAWG_TOKEN }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -21,14 +20,6 @@ jobs:
         run: |
           git config --global user.email "actions@users.noreply.github.com"
           git config --global user.name "GitHub Actions"
-
-      # - name: Check if Github token is set
-      #   run: |
-      #     if [[ -z "${GITHUB_TOKEN}" ]]; then
-      #       echo "GITHUB_TOKEN is not set"
-      #     else
-      #       echo "GITHUB_TOKEN is set"
-      #     fi
         
       - name: Set up Python
         uses: actions/setup-python@v4
