@@ -9,7 +9,7 @@ jobs:
   download-data:
     runs-on: ubuntu-latest
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       GIST_UPDATE_TOKEN: ${{ secrets.GIST_UPDATE_TOKEN }}
       SOCRATA_TOKEN: ${{ secrets.SOCRATA_TOKEN }}
       REACT_APP_JAWG_TOKEN: ${{ secrets.REACT_APP_JAWG_TOKEN }}
@@ -22,13 +22,13 @@ jobs:
           git config --global user.email "actions@users.noreply.github.com"
           git config --global user.name "GitHub Actions"
 
-      - name: Check if Github token is set
-        run: |
-          if [[ -z "${GITHUB_TOKEN}" ]]; then
-            echo "GITHUB_TOKEN is not set"
-          else
-            echo "GITHUB_TOKEN is set"
-          fi
+      # - name: Check if Github token is set
+      #   run: |
+      #     if [[ -z "${GITHUB_TOKEN}" ]]; then
+      #       echo "GITHUB_TOKEN is not set"
+      #     else
+      #       echo "GITHUB_TOKEN is set"
+      #     fi
         
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -95,4 +95,7 @@ jobs:
         run: npm run build
       
       - name: Deploy
-        run: npm run deploy
+        uses: JamesIves/github-pages-deploy-action@4.1.5
+        with:
+          branch: gh-pages
+          folder: dist
