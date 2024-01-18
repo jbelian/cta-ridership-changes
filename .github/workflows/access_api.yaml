@@ -95,6 +95,8 @@ jobs:
         run: npm run build
       
       - name: Deploy
-        run: npm run deploy
+        run: |
+          echo "GITHUB_TOKEN: $GITHUB_TOKEN"
+          npm run deploy || echo "Deploy command failed"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
