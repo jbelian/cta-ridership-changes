@@ -74,6 +74,7 @@ jobs:
         run: git add data/map.json
 
       - name: Commit and push changes
+        if: env.staged == 'true'
         run: |
           git commit -m "automatically fetched update"
           git push
