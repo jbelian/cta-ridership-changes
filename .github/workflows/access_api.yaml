@@ -9,13 +9,13 @@ jobs:
   download-data:
     runs-on: ubuntu-latest
     env:
-      GITHUB_PAT: ${{ secrets.GITHUB_PAT }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       GIST_UPDATE_TOKEN: ${{ secrets.GIST_UPDATE_TOKEN }}
       SOCRATA_TOKEN: ${{ secrets.SOCRATA_TOKEN }}
       REACT_APP_JAWG_TOKEN: ${{ secrets.REACT_APP_JAWG_TOKEN }}
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup Git
         run: |
@@ -24,10 +24,10 @@ jobs:
 
       - name: Check if Github token is set
         run: |
-          if [[ -z "${GITHUB_PAT}" ]]; then
-            echo "GITHUB_PAT is not set"
+          if [[ -z "${GITHUB_TOKEN}" ]]; then
+            echo "GITHUB_TOKEN is not set"
           else
-            echo "GITHUB_PAT is set"
+            echo "GITHUB_TOKEN is set"
           fi
         
       - name: Set up Python
@@ -95,6 +95,6 @@ jobs:
         run: npm run build
       
       - name: Deploy
-        run: npm run deploy
-        env:
-          GITHUB_PAT: ${{ secrets.GITHUB_PAT }}
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          publish_dir: ./dist
