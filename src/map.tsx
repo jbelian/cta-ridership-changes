@@ -7,7 +7,7 @@ import "./App.css";
 import map from "../data/map.json";
 import { CombinedRoutes } from "./busData.tsx";
 
-const jawgToken = 'rFhLAGmwkUZ8ja5hMdt4gLurYTgjA0i9fHVOqyh8NfxewqHPLkKdN4k6SQrN8pXB';
+const jawgToken = import.meta.env.VITE_APP_JAWG_TOKEN;
 
 const Map = ({ filteredRoutes, keyProp }:
   { filteredRoutes: CombinedRoutes[]; keyProp: string }) => {
