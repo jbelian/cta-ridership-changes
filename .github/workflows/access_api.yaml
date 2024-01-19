@@ -9,26 +9,17 @@ jobs:
   download-data:
     runs-on: ubuntu-latest
     env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       GIST_UPDATE_TOKEN: ${{ secrets.GIST_UPDATE_TOKEN }}
       SOCRATA_TOKEN: ${{ secrets.SOCRATA_TOKEN }}
-      REACT_APP_JAWG_TOKEN: ${{ secrets.REACT_APP_JAWG_TOKEN }}
+      VITE_APP_JAWG_TOKEN: ${{ secrets.VITE_APP_JAWG_TOKEN }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
 
       - name: Setup Git
         run: |
-          git config user.email "${{ github.actor }}@users.noreply.github.com"
-          git config user.name "GitHub Action" 
-
-      - name: Check if Github token is set
-        run: |
-          if [[ -z "${GH_TOKEN}" ]]; then
-            echo "GH_TOKEN is not set"
-          else
-            echo "GH_TOKEN is set"
-          fi
+          git config --global user.email "actions@users.noreply.github.com"
+          git config --global user.name "GitHub Actions"
         
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -59,12 +50,14 @@ jobs:
           fi
 
       - name: Install GDAL
+        if: env.staged == 'true'
         run: |
           sudo apt-get update
           sudo apt-get install -y libgdal-dev gdal-bin
           pip3 install GDAL==3.4.1 bs4
 
       - name: Convert map file from KMZ to GeoJSON
+        if: env.staged == 'true'
         run: python ./scripts/kmz_to_json.py
 
       - name: Stage map file
@@ -93,4 +86,7 @@ jobs:
         run: npm run build
       
       - name: Deploy
-        run: npm run deploy
+        uses: JamesIves/github-pages-deploy-action@4.1.5
+        with:
+          branch: gh-pages
+          folder: dist
