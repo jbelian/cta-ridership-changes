@@ -21,10 +21,12 @@ headers = {
     "Authorization": f"token {gist_update_token}",
     "Accept": "application/vnd.github.v3+json",
 }
+fetched_time: socrata_response.headers.get('Date')
+print("Time of fetch:", fetched_time)
 data = {
     "files": {
         "lastFetched.json": {
-            "content": socrata_response.headers.get('Date')
+            "content": fetched_time
         }
     }
 }
