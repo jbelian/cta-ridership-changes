@@ -1,13 +1,38 @@
 // map.tsx
 
-import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
+import { MapContainer, TileLayer, GeoJSON, useMap } from "react-leaflet";
 import { Feature, FeatureCollection, Geometry } from "geojson";
+import L from "leaflet";
+import { useEffect } from "react";
 import "leaflet/dist/leaflet.css";
 import "./App.css";
 import map from "../data/map.json";
 import { CombinedRoutes } from "./busData.tsx";
 
 const jawgToken = import.meta.env.VITE_APP_JAWG_TOKEN;
+
+const Legend = () => {
+  const map = useMap();
+
+  useEffect(() => {
+    const legend = new L.Control({ position: "topright" })
+
+    const grades = [0, 10];
+    const colors = ["#D6E8DD", "#C2E4EF"];
+
+    legend.onAdd = function () {
+      const div = L.DomUtil.create('div', 'info legend');
+      for (let i = 0; i < grades.length; i++) {
+        div.innerHTML += '<i style="background:' + colors[i] + '"></i> ' + grades[i];
+      }
+      return div;
+    };
+
+    legend.addTo(map);
+  }, [map]);
+
+  return null;
+};
 
 const Map = ({ filteredRoutes, keyProp }:
   { filteredRoutes: CombinedRoutes[]; keyProp: string }) => {
@@ -22,11 +47,30 @@ const Map = ({ filteredRoutes, keyProp }:
     const color = setColor(feature);
     const { ROUTE, NAME } = feature.properties;
 
+    function highlightFeature(e: any) {
+      const layer = e.target;
+      layer.bringToFront();
+      layer.setStyle({
+        weight: 5,
+        color: "#7F0"
+      });
+
+      // stackoverflow recommended this for layer.bringToFront -- find out why later
+      // if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) 
+    };
+
+    function resetHighlight(e: any) {
+      e.target.setStyle({
+        weight: 3,
+        color: color,
+      });
+    }
+
+    layer.on({ mouseover: highlightFeature, mouseout: resetHighlight });
     layer.bindTooltip(`Route ${ROUTE}<br/>${NAME}`, { sticky: true, direction: 'auto' });
     layer.setStyle({
       weight: 3,
       color: color,
-      fillOpacity: 1,
     });
   }
 
@@ -77,6 +121,7 @@ const Map = ({ filteredRoutes, keyProp }:
         data={matchingRoutes}
         onEachFeature={onEachFeature}
       />
+      <Legend />
     </MapContainer>
   );
 };
