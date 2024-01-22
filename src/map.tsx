@@ -34,18 +34,23 @@ const Legend = () => {
   return null;
 };
 
+// Time complexity now improved to linear
 const Map = ({ filteredRoutes, keyProp }:
   { filteredRoutes: CombinedRoutes[]; keyProp: string }) => {
+  const filteredRoutesLookup = Object.fromEntries(filteredRoutes.map(route => [route.route, route]));
+
+  const filteredRoutesSet = new Set(filteredRoutes.map(route => route.route));
   const matchingRoutes = {
     type: "FeatureCollection",
     features: map.features.filter((feature) =>
-      filteredRoutes.some((route) => route.route === feature.properties.ROUTE)
+      filteredRoutesSet.has(feature.properties.ROUTE)
     ),
   } as FeatureCollection;
 
   function onEachFeature(feature: Feature<Geometry, any>, layer: any) {
     const color = setColor(feature);
     const { ROUTE, NAME } = feature.properties;
+    const { percentChange, route, routename } = filteredRoutesLookup[ROUTE];
 
     function highlightFeature(e: any) {
       const layer = e.target;
@@ -54,9 +59,6 @@ const Map = ({ filteredRoutes, keyProp }:
         weight: 5,
         color: "#7F0"
       });
-
-      // stackoverflow recommended this for layer.bringToFront -- find out why later
-      // if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) 
     };
 
     function resetHighlight(e: any) {
@@ -66,8 +68,13 @@ const Map = ({ filteredRoutes, keyProp }:
       });
     }
 
+    // routename comes from bus data, and NAME comes from map data. They're not always the same.
+    // Apparently, the CTA prefers the latter on their website, taking Route 146 as an example:
+    // bus data: Inner Drive/Michigan Express
+    // map data: INNER LAKE SHORE/MICHIGAN EXPRESS
     layer.on({ mouseover: highlightFeature, mouseout: resetHighlight });
-    layer.bindTooltip(`Route ${ROUTE}<br/>${NAME}`, { sticky: true, direction: 'auto' });
+    layer.bindTooltip(`Route ${route}<br/>${NAME}<br/>${percentChange}% change`,
+      { sticky: true, direction: 'auto' });
     layer.setStyle({
       weight: 3,
       color: color,
@@ -75,9 +82,7 @@ const Map = ({ filteredRoutes, keyProp }:
   }
 
   function setColor(feature: Feature<Geometry, any>) {
-    const matchingRoute = filteredRoutes.find(
-      (route) => route.route === feature.properties.ROUTE
-    );
+    const matchingRoute = filteredRoutesLookup[feature.properties.ROUTE];
 
     if (!matchingRoute || !matchingRoute.percentChange) return;
 
