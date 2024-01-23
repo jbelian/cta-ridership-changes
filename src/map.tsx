@@ -11,58 +11,48 @@ import { CombinedRoutes } from "./busData.tsx";
 
 const jawgToken = import.meta.env.VITE_APP_JAWG_TOKEN;
 
-const Legend = () => {
-  console.log("I AM LEGEND")
+const colorThresholds = [
+  { threshold: 90, color: "#364B9A" },
+  { threshold: 80, color: "#4063A8" },
+  { threshold: 70, color: "#4A7BB7" },
+  { threshold: 60, color: "#5C90C2" },
+  { threshold: 50, color: "#6EA6CD" },
+  { threshold: 40, color: "#83B8D7" },
+  { threshold: 30, color: "#98CAE1" },
+  { threshold: 20, color: "#ADD7E8" },
+  { threshold: 10, color: "#C2E4EF" },
+  { threshold: 0.001, color: "#D6E8DD" },
+  { threshold: 0, color: "#EAECCC" },
+  { threshold: -10, color: "#F4E3AB" },
+  { threshold: -20, color: "#FEDA8B" },
+  { threshold: -30, color: "#FDC678" },
+  { threshold: -40, color: "#FDB366" },
+  { threshold: -50, color: "#F99858" },
+  { threshold: -60, color: "#F67E4B" },
+  { threshold: -70, color: "#E95D3C" },
+  { threshold: -80, color: "#DD3D2D" },
+  { threshold: -90, color: "#C11E29" },
+  { threshold: -100, color: "#A50026" },
+];
 
+const Legend = () => {
   const map = useMap();
 
   useEffect(() => {
     const legend = new L.Control({ position: "topright" })
-    const getColor = (d: number) => {
-      switch (true) {
-        case d >= 90: return "#364B9A";
-        case d >= 80: return "#4063A8";
-        case d >= 70: return "#4A7BB7";
-        case d >= 60: return "#5C90C2";
-        case d >= 50: return "#6EA6CD";
-        case d >= 40: return "#83B8D7";
-        case d >= 30: return "#98CAE1";
-        case d >= 20: return "#ADD7E8";
-        case d >= 10: return "#C2E4EF";
-        case d > 0: return "#D6E8DD";
-        case d < -90: return "#A50026";
-        case d < -80: return "#C11E29";
-        case d < -70: return "#DD3D2D";
-        case d < -60: return "#E95D3C";
-        case d < -50: return "#F67E4B";
-        case d < -40: return "#F99858";
-        case d < -30: return "#FDB366";
-        case d < -20: return "#FDC678";
-        case d < -10: return "#FEDA8B";
-        case d < 0: return "#F4E3AB";
-        case d == 0: return "#EAECCC";
-        default: return "#FFFFFF";
-      }
-    };
+    function getColor(d: number) {
+      const colorThreshold = colorThresholds.find(threshold => d >= threshold.threshold);
+      return colorThreshold ? colorThreshold.color : "#FFFFFF";
+    }
     legend.onAdd = () => {
       const div = L.DomUtil.create("div", "info legend");
       const grades = [95, 85, 75, 65, 55, 45, 35, 25, 15, 5, 0, -5, -15, -25, -35, -45, -55, -65, -75, -85, -95];
-      const ranges = ["90+", "80", "70", "60", "50", "40", "30", "20", "10", "1", "0", "-1", "-10", "-20", "-30", "-40", "-50", "-60", "-70", "-80", "-90+"]
-      let labels = [];
-      let current;
-      let next;
-
-      for (let i = 0; i < grades.length; i++) {
-        current = grades[i];
-        next = grades[i + 1];
-
-        labels.push(
-          '<i style="background:' + getColor(current) +
-          '; width: 10px; height: 10px; display: inline-block;"></i> ' + ranges[i]
-        );
-      }
-
-      div.innerHTML = labels.join("<br>");
+      const text = ["100%", "", "", "", "", "50%", "", "", "", "", "0%", "", "", "", "", "-50%", "", "", "", "", "-100%"]
+      const labels = grades.map((grade, i) =>
+        '<div style="line-height: 14px;"><i style="background:' + getColor(grade) +
+        '; width: 13px; height: 13px; display: inline-block; vertical-align: top;"></i> ' + text[i] + '</div>'
+      );
+      div.innerHTML = labels.join("");
       return div;
     };
 
@@ -125,33 +115,9 @@ const Map = ({ filteredRoutes, keyProp }:
 
     if (!matchingRoute || !matchingRoute.percentChange) return;
 
-    // This heatmap is derived from the colorblind-friendly "Sunset" color scheme
-    // https://personal.sron.nl/~pault/
     const percentChange = parseFloat(matchingRoute.percentChange);
-    switch (true) {
-      case percentChange >= 90: return "#364B9A";
-      case percentChange >= 80: return "#4063A8";
-      case percentChange >= 70: return "#4A7BB7";
-      case percentChange >= 60: return "#5C90C2";
-      case percentChange >= 50: return "#6EA6CD";
-      case percentChange >= 40: return "#83B8D7";
-      case percentChange >= 30: return "#98CAE1";
-      case percentChange >= 20: return "#ADD7E8";
-      case percentChange >= 10: return "#C2E4EF";
-      case percentChange > 0: return "#D6E8DD";
-      case percentChange < -90: return "#A50026";
-      case percentChange < -80: return "#C11E29";
-      case percentChange < -70: return "#DD3D2D";
-      case percentChange < -60: return "#E95D3C";
-      case percentChange < -50: return "#F67E4B";
-      case percentChange < -40: return "#F99858";
-      case percentChange < -30: return "#FDB366";
-      case percentChange < -20: return "#FDC678";
-      case percentChange < -10: return "#FEDA8B";
-      case percentChange < 0: return "#F4E3AB";
-      case percentChange == 0: return "#EAECCC";
-      default: return "#FFFFFF";
-    }
+    const colorThreshold = colorThresholds.find(threshold => percentChange >= threshold.threshold);
+    return colorThreshold ? colorThreshold.color : "#FFFFFF";
   }
 
   return (
