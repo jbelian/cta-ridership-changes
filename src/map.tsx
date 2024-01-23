@@ -12,25 +12,64 @@ import { CombinedRoutes } from "./busData.tsx";
 const jawgToken = import.meta.env.VITE_APP_JAWG_TOKEN;
 
 const Legend = () => {
+  // I
+  console.log("I AM LEGEND")
+
   const map = useMap();
 
   useEffect(() => {
     const legend = new L.Control({ position: "topright" })
-
-    const grades = [0, 10];
-    const colors = ["#D6E8DD", "#C2E4EF"];
-
-    legend.onAdd = function () {
-      const div = L.DomUtil.create('div', 'info legend');
-      for (let i = 0; i < grades.length; i++) {
-        div.innerHTML += '<i style="background:' + colors[i] + '"></i> ' + grades[i];
+    const getColor = (d: number) => {
+      switch (true) {
+        case d >= 90: return "#364B9A";
+        case d >= 80: return "#4063A8";
+        case d >= 70: return "#4A7BB7";
+        case d >= 60: return "#5C90C2";
+        case d >= 50: return "#6EA6CD";
+        case d >= 40: return "#83B8D7";
+        case d >= 30: return "#98CAE1";
+        case d >= 20: return "#ADD7E8";
+        case d >= 10: return "#C2E4EF";
+        case d > 0: return "#D6E8DD";
+        case d < -90: return "#A50026";
+        case d < -80: return "#C11E29";
+        case d < -70: return "#DD3D2D";
+        case d < -60: return "#E95D3C";
+        case d < -50: return "#F67E4B";
+        case d < -40: return "#F99858";
+        case d < -30: return "#FDB366";
+        case d < -20: return "#FDC678";
+        case d < -10: return "#FEDA8B";
+        case d < 0: return "#F4E3AB";
+        case d == 0: return "#EAECCC";
+        default: return "#FFFFFF";
       }
+    };
+    legend.onAdd = () => {
+      const div = L.DomUtil.create("div", "info legend");
+      const grades = [95, 85, 75, 65, 55, 45, 35, 25, 15, 5, 0, -5, -15, -25, -35, -45, -55, -65, -75, -85, -95];
+      let labels = [];
+      let current;
+      let next;
+
+      for (let i = 0; i < grades.length; i++) {
+        current = grades[i];
+        next = grades[i + 1];
+
+        labels.push(
+          '<i style="background:' +
+          getColor(current) +
+          '; width: 10px; height: 10px; display: inline-block;"></i> ' +
+          current
+        );
+      }
+
+      div.innerHTML = labels.join("<br>");
       return div;
     };
 
     legend.addTo(map);
   }, [map]);
-
   return null;
 };
 
@@ -50,7 +89,9 @@ const Map = ({ filteredRoutes, keyProp }:
   function onEachFeature(feature: Feature<Geometry, any>, layer: any) {
     const color = setColor(feature);
     const { ROUTE, NAME } = feature.properties;
-    const { percentChange, route, routename } = filteredRoutesLookup[ROUTE];
+
+    // routename can also be destructured here if desired
+    const { percentChange, route } = filteredRoutesLookup[ROUTE];
 
     function highlightFeature(e: any) {
       const layer = e.target;
