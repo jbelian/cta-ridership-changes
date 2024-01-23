@@ -12,7 +12,6 @@ import { CombinedRoutes } from "./busData.tsx";
 const jawgToken = import.meta.env.VITE_APP_JAWG_TOKEN;
 
 const Legend = () => {
-  // I
   console.log("I AM LEGEND")
 
   const map = useMap();
@@ -48,6 +47,7 @@ const Legend = () => {
     legend.onAdd = () => {
       const div = L.DomUtil.create("div", "info legend");
       const grades = [95, 85, 75, 65, 55, 45, 35, 25, 15, 5, 0, -5, -15, -25, -35, -45, -55, -65, -75, -85, -95];
+      const ranges = ["90+", "80", "70", "60", "50", "40", "30", "20", "10", "1", "0", "-1", "-10", "-20", "-30", "-40", "-50", "-60", "-70", "-80", "-90+"]
       let labels = [];
       let current;
       let next;
@@ -57,10 +57,8 @@ const Legend = () => {
         next = grades[i + 1];
 
         labels.push(
-          '<i style="background:' +
-          getColor(current) +
-          '; width: 10px; height: 10px; display: inline-block;"></i> ' +
-          current
+          '<i style="background:' + getColor(current) +
+          '; width: 10px; height: 10px; display: inline-block;"></i> ' + ranges[i]
         );
       }
 
