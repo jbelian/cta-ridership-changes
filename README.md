@@ -6,5 +6,5 @@ I drew inspiration for this from my previous project, [Bus Ridership Forecasting
 
 Updates coming soon:
 - Add a toggle to swap the display between bus routes and train routes [(the "L")](https://en.wikipedia.org/wiki/Chicago_%22L%22)
-- Add a legend for change in ridership, from blue (positive) to red (negative)
-- More informative tooltips
+- ~~Add a legend for change in ridership, from blue (positive) to red (negative)~~ ✅
+- ~~More informative tooltips~~ ✅
