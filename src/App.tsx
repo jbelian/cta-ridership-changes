@@ -44,10 +44,17 @@ const App = () => {
   const filteredRoutes = parseBusData(selectedDate1, selectedDate2);
 
   // Handler for date selector
-  const dateChangeHandler = (setter: React.Dispatch<React.SetStateAction<string>>) =>
+  const dateChangeHandler = (index: number, setter: React.Dispatch<React.SetStateAction<string>>) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setter(event.target.value);
-      setKey(`${selectedDate1}-${selectedDate2}`);
+      const newValue = event.target.value;
+      if (newValue < "2001-01" || newValue > lastMonth) {
+        setSelectedDate1("2001-01");
+        setSelectedDate2(lastMonth);
+        setKey(`2001-01-${lastMonth}`);
+      } else {
+        setter(newValue);
+        setKey(index === 0 ? `${newValue}-${selectedDate2}` : `${selectedDate1}-${newValue}`);
+      }
     };
 
   return (
@@ -64,9 +71,7 @@ const App = () => {
                 min="2001-01"
                 max={lastMonth}
                 value={selectedDate}
-                onChange={index === 0 ?
-                  dateChangeHandler(setSelectedDate1) :
-                  dateChangeHandler(setSelectedDate2)}
+                onChange={dateChangeHandler(index, index === 0 ? setSelectedDate1 : setSelectedDate2)}
               />
             </div>
           ))}
