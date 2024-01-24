@@ -6,31 +6,89 @@
 
 .container {
   display: flex;
-}
-
-.sidebar {
-  width: 500px;
+  width: 100vw;
   height: 100vh;
-  background-color: #121414;
-  color: #ECDBBA;
-  overflow-y: auto;
 }
 
+main,
 .leaflet-container {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 500px;
+  width: 100%;
   height: 100%;
 }
 
-.leaflet-interactive:focus {
+.sidebar {
+  width: 700px;
+  height: 100vh;
+  background: #1c1e1e;
+  color: #FFF8DC;
+  overflow-y: auto;
+  padding: 7px 12px;
+}
+
+.sidebar table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.route-column,
+.route-column th,
+.route-column td {
+  width: 55px;
+  text-align: left;
+}
+
+.name-column,
+.name-column th,
+.name-column td {
+  width: auto;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.number-column,
+.number-column th,
+.number-column td {
+  width: 77px;
+  text-align: right;
+}
+
+.change-column,
+.change-column th,
+.change-column td {
+  width: 67px;
+  text-align: right;
+}
+
+.leaflet-interactive {
+  transition: all 0.15s ease-in-out;
   outline: none;
 }
 
+.legend,
+.leaflet-control-zoom a {
+  color: #FFF8DC !important;
+  background: rgba(16, 16, 16, 0.8) !important;
+}
+
+.leaflet-control-attribution {
+  color: #FFF8DC !important;
+  background: rgba(22, 22, 22, 0.8) !important;
+  border-radius: 4px 0 0 0;
+}
+
 .legend {
-  background-color: #121414;
-  color: #ECDBBA;
-  padding: 5px;
+  margin: 12px !important;
+  padding: 8px;
   border-radius: 5px;
+}
+
+.leaflet-control-zoom a {
+  transition: all 0.2s ease;
+}
+
+.leaflet-control-zoom-in:hover,
+.leaflet-control-zoom-out:hover {
+  background: rgba(16, 16, 16, 1) !important;
 }

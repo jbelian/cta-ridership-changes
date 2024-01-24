@@ -28,21 +28,21 @@ function RouteSelection(props: RouteSelectionProps) {
       <table>
         <thead>
           <tr>
-            <th>Route</th>
-            <th>Route Name</th>
-            <th>{getYearAndMonthName(selectedDate1)}</th>
-            <th>{getYearAndMonthName(selectedDate2)}</th>
-            <th>Change</th>
+            <th className="route-column">Route</th>
+            <th className="name-column">Route Name</th>
+            <th className="number-column">{getYearAndMonthName(selectedDate1)}</th>
+            <th className="number-column">{getYearAndMonthName(selectedDate2)}</th>
+            <th className="change-column">Change</th>
           </tr>
         </thead>
         <tbody>
           {filteredRoutes.map((item: CombinedRoutes, index: number) => (
             <tr key={index}>
-              <td>{item.route}</td>
-              <td>{item.routename}</td>
-              <td>{item.monthtotal}</td>
-              <td>{item.monthtotal2}</td>
-              <td>{item.percentChange}</td>
+              <td className="route-column">{item.route}</td>
+              <td className="name-column">{item.routename}</td>
+              <td className="number-column">{item.monthtotal}</td>
+              <td className="number-column">{item.monthtotal2}</td>
+              <td className="change-column">{item.percentChange}</td>
             </tr>
           ))}
         </tbody>
