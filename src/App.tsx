@@ -6,12 +6,15 @@ import Map from "./map.tsx";
 import { parseBusData } from "./busData.tsx";
 import lastModified from "../data/lastModified.json";
 
+const START_DATE = "2001-01";
+const GIST_URL = 'https://api.github.com/gists/cfe1d1c07128822245c55596e7e60971';
+
 const App = () => {
   // Fetch last date of fetch from gist
   const [lastFetchedChicago, setLastFetchedChicago] = useState("");
   useEffect(() => {
     const fetchGist = async () => {
-      const response = await fetch('https://api.github.com/gists/cfe1d1c07128822245c55596e7e60971');
+      const response = await fetch(GIST_URL);
       const data = await response.json();
       const fileContent = data.files['lastFetched.json'].content;
       const lastFetchedGMT = new Date(fileContent);
@@ -47,10 +50,10 @@ const App = () => {
   const dateChangeHandler = (index: number, setter: React.Dispatch<React.SetStateAction<string>>) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = event.target.value;
-      if (newValue < "2001-01" || newValue > lastMonth) {
-        setSelectedDate1("2001-01");
+      if (newValue < START_DATE || newValue > lastMonth) {
+        setSelectedDate1(START_DATE);
         setSelectedDate2(lastMonth);
-        setKey(`2001-01-${lastMonth}`);
+        setKey(START_DATE + `-${lastMonth}`);
       } else {
         setter(newValue);
         setKey(index === 0 ? `${newValue}-${selectedDate2}` : `${selectedDate1}-${newValue}`);
@@ -68,7 +71,7 @@ const App = () => {
               <input
                 name="date"
                 type="month"
-                min="2001-01"
+                min={START_DATE}
                 max={lastMonth}
                 value={selectedDate}
                 onChange={dateChangeHandler(index, index === 0 ? setSelectedDate1 : setSelectedDate2)}
