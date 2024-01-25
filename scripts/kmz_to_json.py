@@ -4,23 +4,30 @@ import subprocess
 from bs4 import BeautifulSoup
 import json
 
-# Download the KMZ file and extract the KML inside
-response = requests.get(f"https://data.cityofchicago.org/download/rytz-fq6y/"
-                        "application%2Fvnd.google-earth.kmz")
-with open('temp.kmz', 'wb') as f:
-    f.write(response.content)
-kmz = zipfile.ZipFile('temp.kmz', 'r')
-kml = kmz.open('doc.kml', 'r').read()
-with open('temp.kml', 'wb') as f:
-    f.write(kml)
+def kmz_to_json(url, output_file):
+    # Download the KMZ file and extract the KML inside
+    response = requests.get(url)
+    with open('temp.kmz', 'wb') as f:
+        f.write(response.content)
+    kmz = zipfile.ZipFile('temp.kmz', 'r')
+    kml = kmz.open('doc.kml', 'r').read()
+    with open('temp.kml', 'wb') as f:
+        f.write(kml)
 
-# Use ogr2ogr to convert KML to GeoJSON
-subprocess.run(['ogr2ogr', '-f', 'GeoJSON', 'data/map.json', 'temp.kml'])
-with open('data/map.json', 'r') as f:
-    data = json.load(f)
+    # Use ogr2ogr to convert KML to GeoJSON
+    subprocess.run(['ogr2ogr', '-f', 'GeoJSON', output_file, 'temp.kml'])
+    with open(output_file, 'r') as f:
+        data = json.load(f)
+    return data
+
+# Call the function with the provided URLs
+bus_data = kmz_to_json("https://data.cityofchicago.org/download/rytz-fq6y/"
+                    "application%2Fvnd.google-earth.kmz", "output1.json")
+train_data = kmz_to_json("https://data.cityofchicago.org/download/sgbp-qafc/"
+                    "application%2Fvnd.google-earth.kmz", "output2.json")
 
 # Clean the HTML from the 'description' field
-for feature in data['features']:
+for feature in bus_data['features']:
     soup = BeautifulSoup(feature['properties']['description'], 'html.parser')
     feature['properties']['description'] = soup.get_text()
 
@@ -55,5 +62,8 @@ for feature in data['features']:
         del feature['properties'][prop]
 
 # Save the cleaned GeoJSON data
-with open('data/map.json', 'w') as f:
-    json.dump(data, f)
+with open('data/busMap.json', 'w') as f:
+    json.dump(bus_data, f)
+
+with open('data/trainMap.json', 'w') as f:
+    json.dump(train_data, f)

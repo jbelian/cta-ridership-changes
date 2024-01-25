@@ -3,65 +3,80 @@ import json
 import requests
 from sodapy import Socrata
 
+# Constants
+DOMAIN = "data.cityofchicago.org"
+BUS_RESOURCE = "bynn-gwxy"
+TRAIN_RESOURCE = "t2rn-p8d7"
+GIST_ID = "cfe1d1c07128822245c55596e7e60971"
+
 # API info for bus ridership data
 os.makedirs('data', exist_ok=True)
-domain = "data.cityofchicago.org"
 socrata_token = os.getenv('SOCRATA_TOKEN')
-client = Socrata(domain, socrata_token)
-socrata_response = requests.get(f"https://{domain}/resource/bynn-gwxy.json",
-                         headers={"X-App-Token": socrata_token})
-print(socrata_response)
-print(socrata_response.headers)
+client = Socrata(DOMAIN, socrata_token)
 
+# Fetch the bus and train ridership data
+bus_response = requests.get(f"https://{DOMAIN}/resource/{BUS_RESOURCE}.json",
+                            headers={"X-App-Token": socrata_token})
+
+train_response = requests.get(f"https://{DOMAIN}/resource/{TRAIN_RESOURCE}.json",
+                              headers={"X-App-Token": socrata_token})
+print("BUS RESPONSE:")
+print(bus_response)
+print(bus_response.headers)
+print("TRAIN RESPONSE:")
+print(train_response)
+print(train_response.headers)
 
 # Update the Gist with the time of the fetch
-gist_id = "cfe1d1c07128822245c55596e7e60971"
 gist_update_token = os.getenv("GIST_UPDATE_TOKEN")
 headers = {
     "Authorization": f"token {gist_update_token}",
     "Accept": "application/vnd.github.v3+json",
 }
-fetched_time = socrata_response.headers.get('Date')
-print("Time of fetch:", fetched_time)
-data = {
+fetch_datetime = {
     "files": {
         "lastFetched.json": {
-            "content": fetched_time
+            "content": bus_response.headers.get('Date')
         }
     }
 }
 
-gist_response = requests.patch(f"https://api.github.com/gists/{gist_id}", headers=headers, json=data)
+gist_response = requests.patch(f"https://api.github.com/gists/{GIST_ID}", headers=headers, json=fetch_datetime)
 gist_response.raise_for_status()
-
 
 # Read the last modified date from lastModified.json
 try:
     with open('data/lastModified.json', 'r') as f:
-        data = json.load(f)
-        last_modified = data.get("lastModified")
+        modified_datetime = json.load(f)
+        last_modified = modified_datetime.get("lastModified")
         print("Current last modified time:", last_modified)
 except FileNotFoundError:
     last_modified = None
 
 # If the API header's 'Last-Modified' value hasn't changed, then this workflow ends here
-response_lm = socrata_response.headers.get('Last-Modified')
+response_lm = bus_response.headers.get('Last-Modified')
 if last_modified == response_lm:
     print("Fetched last modified time:", response_lm)
     print("No new data found, exiting...")
     exit(0)
 
+# Otherwise, the API has new data, so this workflow continues
 else:
     last_modified = response_lm
     print(f"New data found! Time: {last_modified}")
 
-    # Download the bus ridership data    
-    data = client.get('bynn-gwxy', limit=1000000)
+    # Download the bus ridership data
+    bus_data = client.get(BUS_RESOURCE, limit=10000000)
     with open('data/bus.json', 'w') as f:
-        json.dump(data, f)
+        json.dump(bus_data, f)
+
+    # Download the train ridership data
+    train_data = client.get(TRAIN_RESOURCE, limit=10000000)
+    with open('data/train.json', 'w') as f:
+        json.dump(train_data, f)
 
     # That data's most recent month is used as the end date in the date selector
-    last_month = max([item['month_beginning'][:7] for item in data])
+    last_month = max([item['month_beginning'][:7] for item in bus_data])
     
     # Write lastModified and lastMonth to lastModified.json
     # If these are updated, app will be re-deployed

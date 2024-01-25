@@ -42,7 +42,7 @@ jobs:
         
       - name: Stage files if they have updated
         run: |
-          git add data/bus.json data/lastModified.json
+          git add data/bus.json data/train.json data/lastModified.json
           if git diff --staged --quiet; then
             echo 'staged=false' >> $GITHUB_ENV
           else
@@ -56,13 +56,13 @@ jobs:
           sudo apt-get install -y libgdal-dev gdal-bin
           pip3 install GDAL==3.4.1 bs4
 
-      - name: Convert map file from KMZ to GeoJSON
+      - name: Convert map files from KMZ to GeoJSON
         if: env.staged == 'true'
         run: python ./scripts/kmz_to_json.py
 
-      - name: Stage map file
+      - name: Stage map files
         if: env.staged == 'true'
-        run: git add data/map.json
+        run: git add data/busMap.json data/trainMap.json
 
       - name: Commit and push changes
         if: env.staged == 'true'
