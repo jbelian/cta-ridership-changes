@@ -42,7 +42,11 @@ jobs:
         
       - name: Stage files if they have updated
         run: |
-          git add data/bus.json data/train.json data/lastModified.json
+          for file in data/bus.json data/train.json data/lastModified.json; do
+            if [ -f "$file" ]; then
+              git add "$file"
+            fi
+          done
           if git diff --staged --quiet; then
             echo 'staged=false' >> $GITHUB_ENV
           else

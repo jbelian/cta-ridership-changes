@@ -76,7 +76,11 @@ main,
 .leaflet-control-attribution {
   color: #FFF8DC !important;
   background: rgba(22, 22, 22, 0.8) !important;
-  border-radius: 4px 0 0 0;
+  border-radius: 3px 0 0 0;
+}
+
+.leaflet-control-attribution a {
+  color: #39d !important;
 }
 
 .legend {
