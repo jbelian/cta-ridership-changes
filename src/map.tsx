@@ -6,8 +6,8 @@ import L from "leaflet";
 import { useEffect } from "react";
 import "leaflet/dist/leaflet.css";
 import "./App.css";
-import busMap from "../data/busMap.json";
-import trainMap from "../data/trainMap.json";
+// import busMap from "../data/busMap.json";
+import stationMap from "../data/stationMap.json";
 import { CombinedRoutes } from "./busRoutes.tsx";
 
 const jawgToken = import.meta.env.VITE_APP_JAWG_TOKEN;
@@ -65,15 +65,17 @@ const Legend = () => {
 // Time complexity now improved to linear
 const Map = ({ filteredRoutes, keyProp }:
   { filteredRoutes: CombinedRoutes[]; keyProp: string }) => {
-  const filteredRoutesLookup = Object.fromEntries(filteredRoutes.map(route => [route.id, route]));
+  const filteredRoutesLookup = Object.fromEntries(filteredRoutes.map(route => [route.name, route]));
 
-  const filteredRoutesSet = new Set(filteredRoutes.map(route => route.id));
+  const filteredRoutesSet = new Set(filteredRoutes.map(route => route.name));
   const matchingRoutes = {
     type: "FeatureCollection",
-    features: trainMap.features.filter((feature) =>
+    features: stationMap.features.filter((feature) =>
       filteredRoutesSet.has(feature.properties.Name)
     ),
   } as FeatureCollection;
+  // filteredRoutes.forEach(route => { console.log(route.name) });
+  console.log(stationMap.features);
 
   function onEachFeature(feature: Feature<Geometry, any>, layer: any) {
     const color = setColor(feature);
@@ -130,7 +132,7 @@ const Map = ({ filteredRoutes, keyProp }:
       <GeoJSON
         key={keyProp}
         data={matchingRoutes}
-        onEachFeature={onEachFeature}
+      // onEachFeature={onEachFeature}
       />
       <Legend />
     </MapContainer>
