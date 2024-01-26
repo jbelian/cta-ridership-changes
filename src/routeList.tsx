@@ -1,6 +1,6 @@
 // routeList.tsx
 
-import { CombinedRoutes } from "./busRoutes.tsx";
+import { CombinedRoutes } from "./trainStations.tsx";
 
 interface RouteSelectionProps {
   selectedDate1: string;
@@ -38,10 +38,10 @@ function RouteSelection(props: RouteSelectionProps) {
         <tbody>
           {filteredRoutes.map((item: CombinedRoutes, index: number) => (
             <tr key={index}>
-              <td className="route-column">{item.route}</td>
-              <td className="name-column">{item.routename}</td>
-              <td className="number-column">{item.monthtotal}</td>
-              <td className="number-column">{item.monthtotal2}</td>
+              <td className="route-column">{item.id}</td>
+              <td className="name-column">{item.name}</td>
+              <td className="number-column">{item.monthTotal}</td>
+              <td className="number-column">{item.monthTotal2}</td>
               <td className="change-column">{item.percentChange}</td>
             </tr>
           ))}

@@ -1,18 +1,31 @@
 //routes.tsx
 
-import busData from "../data/bus.json";
+import routeData from "../data/bus.json";
+
+// Map the incoming bus JSON data to routes
+const assignRouteData = (trainData: any): Routes[] => {
+  const routes = trainData.map((item: any) => {
+    return {
+      id: item.route,
+      name: item.routename,
+      monthBeginning: item.month_beginning,
+      monthTotal: item.monthtotal,
+    };
+  });
+  return routes;
+}
 
 // Keeping variable names as they are in the incoming JSON file
 export interface Routes {
-  route: string;
-  routename: string;
-  month_beginning: string;
-  monthtotal: string;
+  id: string;
+  name: string;
+  monthBeginning: string;
+  monthTotal: string;
 }
 
 // Additional properties added for comparison between two dates
 export interface CombinedRoutes extends Routes {
-  monthtotal2: string;
+  monthTotal2: string;
   percentChange: string;
 }
 
@@ -25,23 +38,23 @@ export interface CombinedRoutes extends Routes {
 function compareRoutes(a: CombinedRoutes, b: CombinedRoutes): number {
   const removeNonNumeric = (route: string): string => route.replace(/\D/g, "");
 
-  const numericPartA = removeNonNumeric(a.route);
-  const numericPartB = removeNonNumeric(b.route);
+  const numericPartA = removeNonNumeric(a.id);
+  const numericPartB = removeNonNumeric(b.id);
 
   return numericPartA.localeCompare(numericPartB, undefined, {
     numeric: true,
   });
 }
 
-export const parseBusData = (
+export const parseRouteData = (
   selectedDate1: string,
   selectedDate2: string
 ): CombinedRoutes[] => {
-  const busDataArray: Routes[] = busData as Routes[];
+  const routeDataArray: Routes[] = assignRouteData(routeData);
 
   const returnSelectedDate = (date: string) => {
-    return busDataArray.filter((item) => {
-      return date === item.month_beginning.substring(0, 7);
+    return routeDataArray.filter((item) => {
+      return date === item.monthBeginning.substring(0, 7);
     });
   };
 
@@ -58,17 +71,17 @@ export const parseBusData = (
   // Collects routes found in both selected dates and those found only in the first
   filteredRoutes1.forEach((item1) => {
     const matchingItem2 = filteredRoutes2.find(
-      (item2) => item2.route === item1.route
+      (item2) => item2.id === item1.id
     );
 
-    const i: string = item1.monthtotal;
-    const j: string = matchingItem2 ? matchingItem2.monthtotal : "";
+    const i: string = item1.monthTotal;
+    const j: string = matchingItem2 ? matchingItem2.monthTotal : "";
     const x: number = parseFloat(i);
     const y: number = parseFloat(j);
 
     const newItem: CombinedRoutes = {
       ...item1,
-      monthtotal2: j,
+      monthTotal2: j,
       percentChange: matchingItem2
         ? (((y - x) / Math.abs(x)) * 100).toFixed(1)
         : "",
@@ -84,15 +97,15 @@ export const parseBusData = (
   // Collects routes found only in the second selected date
   filteredRoutes2.forEach((item2) => {
     const matchingItem1 = filteredRoutes1.find(
-      (item1) => item1.route === item2.route
+      (item1) => item1.id === item2.id
     );
     if (!matchingItem1) {
       onlyFilteredRoutes2.push({
-        route: item2.route,
-        routename: item2.routename,
-        month_beginning: item2.month_beginning,
-        monthtotal: "",
-        monthtotal2: item2.monthtotal,
+        id: item2.id,
+        name: item2.name,
+        monthBeginning: item2.monthBeginning,
+        monthTotal: "",
+        monthTotal2: item2.monthTotal,
         percentChange: "",
       });
     }

@@ -65,13 +65,13 @@ const Legend = () => {
 // Time complexity now improved to linear
 const Map = ({ filteredRoutes, keyProp }:
   { filteredRoutes: CombinedRoutes[]; keyProp: string }) => {
-  const filteredRoutesLookup = Object.fromEntries(filteredRoutes.map(route => [route.route, route]));
+  const filteredRoutesLookup = Object.fromEntries(filteredRoutes.map(route => [route.id, route]));
 
-  const filteredRoutesSet = new Set(filteredRoutes.map(route => route.route));
+  const filteredRoutesSet = new Set(filteredRoutes.map(route => route.id));
   const matchingRoutes = {
     type: "FeatureCollection",
-    features: busMap.features.filter((feature) =>
-      filteredRoutesSet.has(feature.properties.ROUTE)
+    features: trainMap.features.filter((feature) =>
+      filteredRoutesSet.has(feature.properties.Name)
     ),
   } as FeatureCollection;
 
@@ -80,7 +80,7 @@ const Map = ({ filteredRoutes, keyProp }:
     const { ROUTE, NAME } = feature.properties;
 
     // routename can also be destructured here if desired
-    const { percentChange, route } = filteredRoutesLookup[ROUTE];
+    const { percentChange, id } = filteredRoutesLookup[ROUTE];
 
     function highlightFeature(e: any) {
       const layer = e.target;
@@ -100,10 +100,10 @@ const Map = ({ filteredRoutes, keyProp }:
 
     // routename comes from bus data, and NAME comes from map data. They're not always the same.
     // Apparently, the CTA prefers the latter on their website, taking Route 146 as an example:
-    // bus data: Inner Drive/Michigan Express
-    // map data: INNER LAKE SHORE/MICHIGAN EXPRESS
+    // bus route data: Inner Drive/Michigan Express
+    // bus map data: INNER LAKE SHORE/MICHIGAN EXPRESS
     layer.on({ mouseover: highlightFeature, mouseout: resetHighlight });
-    layer.bindTooltip(`Route ${route}<br/>${NAME}<br/>${percentChange}% change`,
+    layer.bindTooltip(`Route ${id}<br/>${NAME}<br/>${percentChange}% change`,
       { sticky: true, direction: 'auto' });
     layer.setStyle({
       weight: 3,
