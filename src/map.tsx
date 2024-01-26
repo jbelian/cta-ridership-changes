@@ -132,6 +132,16 @@ const Map = ({ filteredRoutes, keyProp }:
       <GeoJSON
         key={keyProp}
         data={matchingRoutes}
+        pointToLayer={(feature, latlng) => {
+          return L.circleMarker(latlng, {
+            radius: 8, // You can adjust the radius here
+            fillColor: "#eaeccc", // Fill color of the circle
+            color: "#0F0", // Border color of the circle
+            weight: 1, // Border width
+            opacity: 1,
+            fillOpacity: 0.8,
+          });
+        }}
       // onEachFeature={onEachFeature}
       />
       <Legend />

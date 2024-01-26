@@ -20,6 +20,20 @@ def kmz_to_json(url, output_file):
         data = json.load(f)
     return data
 
+def clean_properties(data, properties):
+    for feature in data['features']:
+        # Extract the HTML description
+        soup = BeautifulSoup(feature['properties']['description'], 'html.parser')
+
+        # Extract the specified properties from the HTML content
+        extracted_props = {}
+        for prop in properties:
+            value = soup.find(text=prop).find_next('td').text
+            extracted_props[prop] = value
+
+        # Replace the feature's properties with the extracted properties
+        feature['properties'] = extracted_props
+
 # Call the functions with the provided URLs
 bus_data = kmz_to_json("https://data.cityofchicago.org/download/rytz-fq6y/"
                     "application%2Fvnd.google-earth.kmz", "output1.json")
@@ -29,40 +43,59 @@ station_data = kmz_to_json("https://data.cityofchicago.org/download/4qtv-9w43/"
                            "application%2Fvnd.google-earth.kmz", "output3.json")
 
 
-# Clean the HTML from the 'description' field
-for feature in bus_data['features']:
-    soup = BeautifulSoup(feature['properties']['description'], 'html.parser')
-    feature['properties']['description'] = soup.get_text()
+# After cleaning, each feature's full 'properties' field is shown below
+# That's unnecessary, as only the parameters specified are needed for now
 
-    # After cleaning, each feature's 'properties' field looks like this
-    # For now, we want only the 'ROUTE' and 'NAME' properties (case-sensitive)
-    #  "Name": "111A",
-    #  "description": "a bunch of gibberish",
-    #  "altitudeMode": "clampToGround",
-    #  "tessellate": 1,
-    #  "extrude": 0,
-    #  "visibility": -1,
-    #  "snippet": "",
-    #  "ROUTE": "111A",
-    #  "ROUTE0": "111A",
-    #  "NAME": "PULLMAN SHUTTLE",
-    #  "WKDAY": "1",
-    #  "SAT": "1",
-    #  "SUN": "1",
-    #  "SHAPE.LEN": "19392.594684"
-    for table in soup.find_all('table'):
-        for row in table.find_all('tr'):
-            cells = row.find_all('td')
-            if len(cells) == 2:
-                prop = cells[0].get_text().strip()
-                value = cells[1].get_text().strip()
-                if prop in ["ROUTE", "NAME"]:
-                    feature['properties'][prop] = value
+#  "Name": "111A",
+#  "description": "a bunch of gibberish",
+#  "altitudeMode": "clampToGround",
+#  "tessellate": 1,
+#  "extrude": 0,
+#  "visibility": -1,
+#  "snippet": "",
+#  "ROUTE": "111A",
+#  "ROUTE0": "111A",
+#  "NAME": "PULLMAN SHUTTLE",
+#  "WKDAY": "1",
+#  "SAT": "1",
+#  "SUN": "1",
+#  "SHAPE.LEN": "19392.594684"
+clean_properties(bus_data, ['ROUTE', 'NAME'])
 
-    # Remove unwanted properties
-    unwanted_props = [prop for prop in feature['properties'] if prop not in ["ROUTE", "NAME"]]
-    for prop in unwanted_props:
-        del feature['properties'][prop]
+
+# "Name": "Brown, Green, Orange, Pink, Purple (Exp)",
+# "LINES": "Brown, Green, Orange, Pink, Purple (Exp)",
+# "DESCRIPTIO": "Clark/Lake to State/Lake",
+# "TYPE": "Elevated or at Grade",
+# "LEGEND": "ML",
+# "ALT_LEGEND": "L4",
+# "BRANCH": "Loop Elevated",
+# "OWL": "No",
+# "SHAPE": "Polyline",
+# "SHAPE.LEN": "830.774585",
+# "altitudeMode": "clampToGround",
+# "tessellate": 1,
+# "extrude": 0,
+# "visibility": -1,
+# "snippet": ""
+clean_properties(train_data, ['LEGEND', 'ALT_LEGEND'])
+
+# "Name": "Clark/Lake",
+# "Station ID": "380",
+# "Station Name": "Clark/Lake",
+# "Rail Line": "Brown, Orange, Pink, Purple (Express), Green, Blue",
+# "Address": "100 W. Lake",
+# "ADA": "ADA Accessible",
+# "Park and Ride": "No",
+# "POINT_X": "1175525.859134",
+# "POINT_Y": "1901735.36642",
+# "altitudeMode": "clampToGround",
+# "tessellate": -1,
+# "extrude": 0,
+# "visibility": -1,
+# "snippet": ""
+clean_properties(station_data, ['Station ID', 'Station Name'])
+
 
 # Save the cleaned GeoJSON data
 with open('data/busMap.json', 'w') as f:
