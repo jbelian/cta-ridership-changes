@@ -70,8 +70,8 @@ else:
     with open('data/busData.json', 'w') as f:
         json.dump(bus_data, f)
 
-    # Subtract 40000 from each station ridership ID to match the station map ID,
-    # and download the station ridership data
+    # Subtract 40000 from each station ridership ID to match the station map ID
+    # Download the station ridership data
     station_data = client.get(STATION_RESOURCE, limit=10000000)
     for item in station_data:
         item['station_id'] = str(int(item['station_id']) - 40000)
