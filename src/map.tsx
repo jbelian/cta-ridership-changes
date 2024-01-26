@@ -65,16 +65,18 @@ const Legend = () => {
 // Time complexity now improved to linear
 const Map = ({ filteredRoutes, keyProp }:
   { filteredRoutes: CombinedRoutes[]; keyProp: string }) => {
-  const filteredRoutesLookup = Object.fromEntries(filteredRoutes.map(route => [route.name, route]));
+  const filteredRoutesLookup = Object.fromEntries(filteredRoutes.map(route => [route.id, route]));
 
-  const filteredRoutesSet = new Set(filteredRoutes.map(route => route.name));
+  const filteredRoutesSet = new Set(filteredRoutes.map(route => route.id));
+
   const matchingRoutes = {
     type: "FeatureCollection",
     features: stationMap.features.filter((feature) =>
-      filteredRoutesSet.has(feature.properties.Name)
+      filteredRoutesSet.has(feature.properties["Station ID"])
     ),
   } as FeatureCollection;
-  // filteredRoutes.forEach(route => { console.log(route.name) });
+
+  console.log(filteredRoutesSet)
   console.log(stationMap.features);
 
   function onEachFeature(feature: Feature<Geometry, any>, layer: any) {
