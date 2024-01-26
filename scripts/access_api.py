@@ -6,7 +6,7 @@ from sodapy import Socrata
 # Constants
 DOMAIN = "data.cityofchicago.org"
 BUS_RESOURCE = "bynn-gwxy"
-TRAIN_RESOURCE = "t2rn-p8d7"
+STATION_RESOURCE = "t2rn-p8d7"
 GIST_ID = "cfe1d1c07128822245c55596e7e60971"
 
 # API info for bus ridership data
@@ -14,18 +14,18 @@ os.makedirs('data', exist_ok=True)
 socrata_token = os.getenv('SOCRATA_TOKEN')
 client = Socrata(DOMAIN, socrata_token)
 
-# Fetch the bus and train ridership data
+# Fetch the bus and station ridership data
 bus_response = requests.get(f"https://{DOMAIN}/resource/{BUS_RESOURCE}.json",
                             headers={"X-App-Token": socrata_token})
 
-train_response = requests.get(f"https://{DOMAIN}/resource/{TRAIN_RESOURCE}.json",
+station_response = requests.get(f"https://{DOMAIN}/resource/{STATION_RESOURCE}.json",
                               headers={"X-App-Token": socrata_token})
 print("BUS RESPONSE:")
 print(bus_response)
 print(bus_response.headers)
-print("TRAIN RESPONSE:")
-print(train_response)
-print(train_response.headers)
+print("STATION RESPONSE:")
+print(station_response)
+print(station_response.headers)
 
 # Update the Gist with the time of the fetch
 gist_update_token = os.getenv("GIST_UPDATE_TOKEN")
@@ -67,13 +67,13 @@ else:
 
     # Download the bus ridership data
     bus_data = client.get(BUS_RESOURCE, limit=10000000)
-    with open('data/bus.json', 'w') as f:
+    with open('data/busData.json', 'w') as f:
         json.dump(bus_data, f)
 
-    # Download the train ridership data
-    train_data = client.get(TRAIN_RESOURCE, limit=10000000)
-    with open('data/train.json', 'w') as f:
-        json.dump(train_data, f)
+    # Download the station ridership data
+    station_data = client.get(STATION_RESOURCE, limit=10000000)
+    with open('data/stationData.json', 'w') as f:
+        json.dump(station_data, f)
 
     # That data's most recent month is used as the end date in the date selector
     last_month = max([item['month_beginning'][:7] for item in bus_data])

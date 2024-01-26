@@ -1,10 +1,10 @@
 //routes.tsx
 
-import routeData from "../data/bus.json";
+import routeData from "../data/busData.json";
 
 // Map the incoming bus JSON data to routes
-const assignRouteData = (trainData: any): Routes[] => {
-  const routes = trainData.map((item: any) => {
+const assignRouteData = (data: any): Routes[] => {
+  const routes = data.map((item: any) => {
     return {
       id: item.route,
       name: item.routename,

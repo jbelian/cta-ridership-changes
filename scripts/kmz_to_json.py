@@ -35,11 +35,11 @@ def clean_properties(data, properties):
         feature['properties'] = extracted_props
 
 # Call the functions with the provided URLs
-bus_data = kmz_to_json("https://data.cityofchicago.org/download/rytz-fq6y/"
+bus_map_data = kmz_to_json("https://data.cityofchicago.org/download/rytz-fq6y/"
                     "application%2Fvnd.google-earth.kmz", "output1.json")
-train_data = kmz_to_json("https://data.cityofchicago.org/download/sgbp-qafc/"
+rail_map_data = kmz_to_json("https://data.cityofchicago.org/download/sgbp-qafc/"
                     "application%2Fvnd.google-earth.kmz", "output2.json")
-station_data = kmz_to_json("https://data.cityofchicago.org/download/4qtv-9w43/"
+station_map_data = kmz_to_json("https://data.cityofchicago.org/download/4qtv-9w43/"
                            "application%2Fvnd.google-earth.kmz", "output3.json")
 
 
@@ -60,7 +60,7 @@ station_data = kmz_to_json("https://data.cityofchicago.org/download/4qtv-9w43/"
 #  "SAT": "1",
 #  "SUN": "1",
 #  "SHAPE.LEN": "19392.594684"
-clean_properties(bus_data, ['ROUTE', 'NAME'])
+clean_properties(bus_map_data, ['ROUTE', 'NAME'])
 
 
 # "Name": "Brown, Green, Orange, Pink, Purple (Exp)",
@@ -78,7 +78,7 @@ clean_properties(bus_data, ['ROUTE', 'NAME'])
 # "extrude": 0,
 # "visibility": -1,
 # "snippet": ""
-clean_properties(train_data, ['LEGEND', 'ALT_LEGEND'])
+clean_properties(rail_map_data, ['LEGEND', 'ALT_LEGEND'])
 
 # "Name": "Clark/Lake",
 # "Station ID": "380",
@@ -94,13 +94,12 @@ clean_properties(train_data, ['LEGEND', 'ALT_LEGEND'])
 # "extrude": 0,
 # "visibility": -1,
 # "snippet": ""
-clean_properties(station_data, ['Station ID', 'Station Name'])
-
+clean_properties(station_map_data, ['Station ID', 'Station Name'])
 
 # Save the cleaned GeoJSON data
 with open('data/busMap.json', 'w') as f:
-    json.dump(bus_data, f)
-with open('data/trainMap.json', 'w') as f:
-    json.dump(train_data, f)
+    json.dump(bus_map_data, f)
+with open('data/railMap.json', 'w') as f:
+    json.dump(rail_map_data, f)
 with open('data/stationMap.json', 'w') as f:
-    json.dump(station_data, f)
+    json.dump(station_map_data, f)
