@@ -42,7 +42,7 @@ jobs:
         
       - name: Stage files if they have updated
         run: |
-          for file in data/bus.json data/train.json data/lastModified.json; do
+          for file in data/bus.json data/train.json data/station.json data/lastModified.json; do
             if [ -f "$file" ]; then
               git add "$file"
             fi
@@ -66,7 +66,7 @@ jobs:
 
       - name: Stage map files
         if: env.staged == 'true'
-        run: git add data/busMap.json data/trainMap.json
+        run: git add data/busMap.json data/trainMap.json data/stationMap.json
 
       - name: Commit and push changes
         if: env.staged == 'true'

@@ -1,6 +1,6 @@
 // routeList.tsx
 
-import { CombinedRoutes } from "./busData.tsx";
+import { CombinedRoutes } from "./busRoutes.tsx";
 
 interface RouteSelectionProps {
   selectedDate1: string;

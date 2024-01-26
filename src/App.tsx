@@ -3,8 +3,10 @@
 import React, { useEffect, useState } from "react";
 import RouteSelection from "./routeList.tsx";
 import Map from "./map.tsx";
-import { parseBusData } from "./busData.tsx";
+import { parseBusData } from "./busRoutes.tsx";
+import { parseRouteData } from "./trainRoutes.tsx";
 import lastModified from "../data/lastModified.json";
+
 
 const START_DATE = "2001-01";
 const GIST_URL = 'https://api.github.com/gists/cfe1d1c07128822245c55596e7e60971';
@@ -44,7 +46,7 @@ const App = () => {
   const [key, setKey] = useState(`${selectedDate1}-${selectedDate2}`);
 
   // Filtered routes sent to both the route list and map
-  const filteredRoutes = parseBusData(selectedDate1, selectedDate2);
+  const filteredRoutes = parseRouteData(selectedDate1, selectedDate2);
 
   // Handler for date selector
   const dateChangeHandler = (index: number, setter: React.Dispatch<React.SetStateAction<string>>) =>
@@ -85,9 +87,9 @@ const App = () => {
           filteredRoutes={filteredRoutes}
         />
       </aside>
-      <main>
+      {/* <main>
         <Map keyProp={key} filteredRoutes={filteredRoutes} />
-      </main>
+      </main> */}
     </div>
   );
 };

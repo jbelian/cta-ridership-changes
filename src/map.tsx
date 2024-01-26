@@ -6,8 +6,9 @@ import L from "leaflet";
 import { useEffect } from "react";
 import "leaflet/dist/leaflet.css";
 import "./App.css";
-import map from "../data/map.json";
-import { CombinedRoutes } from "./busData.tsx";
+import busMap from "../data/busMap.json";
+import trainMap from "../data/trainMap.json";
+import { CombinedRoutes } from "./busRoutes.tsx";
 
 const jawgToken = import.meta.env.VITE_APP_JAWG_TOKEN;
 
@@ -69,7 +70,7 @@ const Map = ({ filteredRoutes, keyProp }:
   const filteredRoutesSet = new Set(filteredRoutes.map(route => route.route));
   const matchingRoutes = {
     type: "FeatureCollection",
-    features: map.features.filter((feature) =>
+    features: busMap.features.filter((feature) =>
       filteredRoutesSet.has(feature.properties.ROUTE)
     ),
   } as FeatureCollection;

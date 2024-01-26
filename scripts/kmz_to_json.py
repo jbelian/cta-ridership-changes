@@ -20,11 +20,14 @@ def kmz_to_json(url, output_file):
         data = json.load(f)
     return data
 
-# Call the function with the provided URLs
+# Call the functions with the provided URLs
 bus_data = kmz_to_json("https://data.cityofchicago.org/download/rytz-fq6y/"
                     "application%2Fvnd.google-earth.kmz", "output1.json")
 train_data = kmz_to_json("https://data.cityofchicago.org/download/sgbp-qafc/"
                     "application%2Fvnd.google-earth.kmz", "output2.json")
+station_data = kmz_to_json("https://data.cityofchicago.org/download/4qtv-9w43/"
+                           "application%2Fvnd.google-earth.kmz", "output3.json")
+
 
 # Clean the HTML from the 'description' field
 for feature in bus_data['features']:
@@ -64,6 +67,7 @@ for feature in bus_data['features']:
 # Save the cleaned GeoJSON data
 with open('data/busMap.json', 'w') as f:
     json.dump(bus_data, f)
-
 with open('data/trainMap.json', 'w') as f:
     json.dump(train_data, f)
+with open('data/stationMap.json', 'w') as f:
+    json.dump(station_data, f)
