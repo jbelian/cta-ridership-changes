@@ -73,33 +73,30 @@ const Legend = () => {
 
 const Map = ({ keyProp, toggleTransitData, boardings }:
   { boardings: CombinedBoardings[]; keyProp: string; toggleTransitData: boolean }) => {
-  const boardingsLookup = Object.fromEntries(boardings.map(boarding => [boarding.id, boarding]));
-
+  const boardingsPairs = boardings.map(boarding => { return [boarding["id"], boarding]; });
+  const boardingsLookup = Object.fromEntries(boardingsPairs);
   const boardingsSet = new Set(
     boardings
       .filter(boarding => boarding.percentChange && boarding.percentChange.trim() !== '')
       .map(boarding => boarding.id)
   );
 
-  const boardingMap = toggleTransitData ? stationMap : busMap;
-  const idProperty = toggleTransitData ? "Station ID" : "ROUTE";
-
+  const boardingsMap = toggleTransitData ? busMap : stationMap;
+  const mapID = toggleTransitData ? "ROUTE" : "Station ID";
   const matchingBoardings = {
     type: "FeatureCollection",
-    features: boardingMap.features.filter((feature) =>
-      boardingsSet.has((feature.properties as any)[idProperty])
+    features: boardingsMap.features.filter((feature) =>
+      boardingsSet.has(String((feature.properties as any)[mapID]))
     ),
   } as FeatureCollection;
 
   function onEachBoarding(feature: Feature<Geometry, any>, layer: any) {
     const color = setColor(feature);
-    const { id, name } = feature.properties;
-    if (!boardingsLookup[id]) {
-      console.log(`No boarding data found for id: ${id}`);
-      return;
-    }
+    const mapID = feature.properties[toggleTransitData ? "ROUTE" : "Station ID"];
+    const name = feature.properties["name"];
+    if (!boardingsLookup[mapID]) { return }
 
-    const { percentChange, monthTotal2 } = boardingsLookup[id];
+    const { percentChange, monthTotal2 } = boardingsLookup[mapID];
 
     function highlightFeature(e: any) {
       const layer = e.target;
@@ -127,14 +124,16 @@ const Map = ({ keyProp, toggleTransitData, boardings }:
   }
 
   function setColor(feature: Feature<Geometry, any>) {
-    const matchingBoarding = boardingsLookup[feature.properties.id];
-
-    if (!matchingBoarding || !matchingBoarding.percentChange) return;
+    const mapID = feature.properties[toggleTransitData ? "ROUTE" : "Station ID"];
+    const matchingBoarding = boardingsLookup[mapID];
+    if (!matchingBoarding) { return "#000" }
 
     const percentChange = parseFloat(matchingBoarding.percentChange);
     const colorThreshold = colorThresholds.find(threshold => percentChange >= threshold.threshold);
-    return colorThreshold ? colorThreshold.color : "#FFFFFF";
+    return colorThreshold ? colorThreshold.color : "#FFF";
   }
+
+  if (!boardings || boardings.length === 0) { return <div>Loading...</div> }
 
   return (
     <MapContainer center={[41.8781, -87.63]} zoom={13}>
@@ -143,12 +142,13 @@ const Map = ({ keyProp, toggleTransitData, boardings }:
                     &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url={`https://{s}.tile.jawg.io/jawg-dark/{z}/{x}/{y}{r}.png?access-token=${jawgToken}`}
       />
-      {toggleTransitData && <RailLines />}
+      {!toggleTransitData && <RailLines />}
       <GeoJSON
         key={keyProp}
         data={matchingBoardings}
         pointToLayer={(feature, latlng) => {
-          const matchingBoarding = boardingsLookup[feature.properties.id];
+          const mapID = feature.properties[toggleTransitData ? "ROUTE" : "Station ID"];
+          const matchingBoarding = boardingsLookup[mapID];
           let radius = 8;
           if (matchingBoarding && matchingBoarding.monthTotal2) {
             radius = Math.sqrt(parseFloat(matchingBoarding.monthTotal2)) * .03;
