@@ -1,13 +1,4 @@
-// boardingsList.tsx
-
 import { CombinedBoardings } from "../utils/dataHandlers.tsx";
-
-interface BoardingsSelectionProps {
-  selectedDate1: string;
-  selectedDate2: string;
-  filteredBoardings: CombinedBoardings[];
-  toggleTransitData: boolean;
-}
 
 const getYearAndMonthName = (dateString: string) => {
   const date = new Date(`${dateString}T00:00:00`);
@@ -18,13 +9,17 @@ const getYearAndMonthName = (dateString: string) => {
   return `${monthName} ${year}`;
 };
 
-function BoardingsSelection(props: BoardingsSelectionProps) {
-  const {
-    selectedDate1,
-    selectedDate2,
-    filteredBoardings,
-    toggleTransitData
-  } = props;
+function BoardingsDisplay({
+  selectedDate1,
+  selectedDate2,
+  filteredBoardings,
+  toggleTransitData
+}: {
+  selectedDate1: string;
+  selectedDate2: string;
+  filteredBoardings: CombinedBoardings[];
+  toggleTransitData: boolean;
+}) {
   return (
     <div>
       <table>
@@ -53,4 +48,4 @@ function BoardingsSelection(props: BoardingsSelectionProps) {
   );
 }
 
-export default BoardingsSelection;
+export default BoardingsDisplay;
