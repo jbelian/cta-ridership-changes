@@ -1,11 +1,12 @@
-// routeList.tsx
+// boardingsList.tsx
 
 import { CombinedBoardings } from "../utils/dataHandlers.tsx";
 
-interface RouteSelectionProps {
+interface BoardingsSelectionProps {
   selectedDate1: string;
   selectedDate2: string;
-  filteredRoutes: CombinedBoardings[];
+  filteredBoardings: CombinedBoardings[];
+  toggleTransitData: boolean;
 }
 
 const getYearAndMonthName = (dateString: string) => {
@@ -17,28 +18,29 @@ const getYearAndMonthName = (dateString: string) => {
   return `${monthName} ${year}`;
 };
 
-function RouteSelection(props: RouteSelectionProps) {
+function BoardingsSelection(props: BoardingsSelectionProps) {
   const {
     selectedDate1,
     selectedDate2,
-    filteredRoutes
+    filteredBoardings,
+    toggleTransitData
   } = props;
   return (
     <div>
       <table>
         <thead>
           <tr>
-            <th className="route-column">Route</th>
-            <th className="name-column">Route Name</th>
+            {toggleTransitData && <th className="route-column">Route</th>}
+            <th className="name-column">{toggleTransitData ? 'Bus' : 'Train Station'}</th>
             <th className="number-column">{getYearAndMonthName(selectedDate1)}</th>
             <th className="number-column">{getYearAndMonthName(selectedDate2)}</th>
             <th className="change-column">Change</th>
           </tr>
         </thead>
         <tbody>
-          {filteredRoutes.map((item: CombinedBoardings, index: number) => (
+          {filteredBoardings.map((item: CombinedBoardings, index: number) => (
             <tr key={index}>
-              <td className="route-column">{item.id}</td>
+              {toggleTransitData && <td className="route-column">{item.id}</td>}
               <td className="name-column">{item.name}</td>
               <td className="number-column">{item.monthTotal}</td>
               <td className="number-column">{item.monthTotal2}</td>
@@ -51,4 +53,4 @@ function RouteSelection(props: RouteSelectionProps) {
   );
 }
 
-export default RouteSelection;
+export default BoardingsSelection;
