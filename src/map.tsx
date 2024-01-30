@@ -6,13 +6,22 @@ import L from "leaflet";
 import { useEffect } from "react";
 import "leaflet/dist/leaflet.css";
 import "./App.css";
-// import busMap from "../data/busMap.json";
-import stationMap from "../data/stationMap.json";
-import { CombinedRoutes } from "./busRoutes.tsx";
+import RailLines from './railLines.tsx'
+import stationMap from '../data/stationMap.json';
+import busMap from '../data/busMap.json';
+import { CombinedBoardings } from '../utils/dataHandlers.tsx';
 
 const jawgToken = import.meta.env.VITE_APP_JAWG_TOKEN;
 
+// Colorblind friendly colors for -100% to 100% derived from
+// "sunset" color scheme here https://personal.sron.nl/~pault/
+// Hot pink added for exponential tail of numbers above 100%
 const colorThresholds = [
+  { threshold: 500, color: "#aa4499" },
+  { threshold: 354, color: "#934599" },
+  { threshold: 251, color: "#7c4799" },
+  { threshold: 178, color: "#64489a" },
+  { threshold: 126, color: "#4d4a9a" },
   { threshold: 90, color: "#364B9A" },
   { threshold: 80, color: "#4063A8" },
   { threshold: 70, color: "#4A7BB7" },
@@ -47,8 +56,8 @@ const Legend = () => {
     }
     legend.onAdd = () => {
       const div = L.DomUtil.create("div", "info legend");
-      const grades = [95, 85, 75, 65, 55, 45, 35, 25, 15, 5, 0, -5, -15, -25, -35, -45, -55, -65, -75, -85, -95];
-      const text = ["100%", "", "", "", "", "50%", "", "", "", "", "0%", "", "", "", "", "-50%", "", "", "", "", "-100%"]
+      const grades = [500, 354, 251, 178, 126, 95, 85, 75, 65, 55, 45, 35, 25, 15, 5, 0, -5, -15, -25, -35, -45, -55, -65, -75, -85, -95];
+      const text = ["1000%", "", "", "", "", "100%", "", "", "", "", "50%", "", "", "", "", "0%", "", "", "", "", "-50%", "", "", "", "", "-100%"]
       const labels = grades.map((grade, i) =>
         '<div style="line-height: 14px;"><i style="background:' + getColor(grade) +
         '; width: 13px; height: 13px; display: inline-block; vertical-align: top;"></i> ' + text[i] + '</div>'
@@ -62,29 +71,35 @@ const Legend = () => {
   return null;
 };
 
-// Time complexity now improved to linear
-const Map = ({ filteredRoutes, keyProp }:
-  { filteredRoutes: CombinedRoutes[]; keyProp: string }) => {
-  const filteredRoutesLookup = Object.fromEntries(filteredRoutes.map(route => [route.id, route]));
+const Map = ({ keyProp, toggleTransitData, boardings }:
+  { boardings: CombinedBoardings[]; keyProp: string; toggleTransitData: boolean }) => {
+  const boardingsLookup = Object.fromEntries(boardings.map(boarding => [boarding.id, boarding]));
 
-  const filteredRoutesSet = new Set(filteredRoutes.map(route => route.id));
+  const boardingsSet = new Set(
+    boardings
+      .filter(boarding => boarding.percentChange && boarding.percentChange.trim() !== '')
+      .map(boarding => boarding.id)
+  );
 
-  const matchingRoutes = {
+  const boardingMap = toggleTransitData ? stationMap : busMap;
+  const idProperty = toggleTransitData ? "Station ID" : "ROUTE";
+
+  const matchingBoardings = {
     type: "FeatureCollection",
-    features: stationMap.features.filter((feature) =>
-      filteredRoutesSet.has(feature.properties["Station ID"])
+    features: boardingMap.features.filter((feature) =>
+      boardingsSet.has((feature.properties as any)[idProperty])
     ),
   } as FeatureCollection;
 
-  console.log(filteredRoutesSet)
-  console.log(stationMap.features);
-
-  function onEachFeature(feature: Feature<Geometry, any>, layer: any) {
+  function onEachBoarding(feature: Feature<Geometry, any>, layer: any) {
     const color = setColor(feature);
-    const { ROUTE, NAME } = feature.properties;
+    const { id, name } = feature.properties;
+    if (!boardingsLookup[id]) {
+      console.log(`No boarding data found for id: ${id}`);
+      return;
+    }
 
-    // routename can also be destructured here if desired
-    const { percentChange, id } = filteredRoutesLookup[ROUTE];
+    const { percentChange, monthTotal2 } = boardingsLookup[id];
 
     function highlightFeature(e: any) {
       const layer = e.target;
@@ -102,12 +117,8 @@ const Map = ({ filteredRoutes, keyProp }:
       });
     }
 
-    // routename comes from bus data, and NAME comes from map data. They're not always the same.
-    // Apparently, the CTA prefers the latter on their website, taking Route 146 as an example:
-    // bus route data: Inner Drive/Michigan Express
-    // bus map data: INNER LAKE SHORE/MICHIGAN EXPRESS
     layer.on({ mouseover: highlightFeature, mouseout: resetHighlight });
-    layer.bindTooltip(`Route ${id}<br/>${NAME}<br/>${percentChange}% change`,
+    layer.bindTooltip(`${name}<br/>${monthTotal2} boardings<br/>${percentChange}% change`,
       { sticky: true, direction: 'auto' });
     layer.setStyle({
       weight: 3,
@@ -116,11 +127,11 @@ const Map = ({ filteredRoutes, keyProp }:
   }
 
   function setColor(feature: Feature<Geometry, any>) {
-    const matchingRoute = filteredRoutesLookup[feature.properties.ROUTE];
+    const matchingBoarding = boardingsLookup[feature.properties.id];
 
-    if (!matchingRoute || !matchingRoute.percentChange) return;
+    if (!matchingBoarding || !matchingBoarding.percentChange) return;
 
-    const percentChange = parseFloat(matchingRoute.percentChange);
+    const percentChange = parseFloat(matchingBoarding.percentChange);
     const colorThreshold = colorThresholds.find(threshold => percentChange >= threshold.threshold);
     return colorThreshold ? colorThreshold.color : "#FFFFFF";
   }
@@ -128,23 +139,30 @@ const Map = ({ filteredRoutes, keyProp }:
   return (
     <MapContainer center={[41.8781, -87.63]} zoom={13}>
       <TileLayer
-        attribution='<a href="http://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution='&copy; <a href="http://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank"><b>Jawg</b>Maps</a> 
+                    &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url={`https://{s}.tile.jawg.io/jawg-dark/{z}/{x}/{y}{r}.png?access-token=${jawgToken}`}
       />
+      {toggleTransitData && <RailLines />}
       <GeoJSON
         key={keyProp}
-        data={matchingRoutes}
+        data={matchingBoardings}
         pointToLayer={(feature, latlng) => {
+          const matchingBoarding = boardingsLookup[feature.properties.id];
+          let radius = 8;
+          if (matchingBoarding && matchingBoarding.monthTotal2) {
+            radius = Math.sqrt(parseFloat(matchingBoarding.monthTotal2)) * .03;
+          }
           return L.circleMarker(latlng, {
-            radius: 8, // You can adjust the radius here
-            fillColor: "#eaeccc", // Fill color of the circle
-            color: "#0F0", // Border color of the circle
-            weight: 1, // Border width
+            radius: radius,
+            fillColor: setColor(feature),
+            color: "#0F0",
+            weight: 1,
             opacity: 1,
             fillOpacity: 0.8,
           });
         }}
-      // onEachFeature={onEachFeature}
+        onEachFeature={onEachBoarding}
       />
       <Legend />
     </MapContainer>
