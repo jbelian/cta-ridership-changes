@@ -91,12 +91,10 @@ const Map = ({ keyProp, toggleTransitData, boardings }:
   } as FeatureCollection;
 
   function onEachBoarding(feature: Feature<Geometry, any>, layer: any) {
-    const color = setColor(feature);
     const mapID = feature.properties[toggleTransitData ? "ROUTE" : "Station ID"];
-    const name = feature.properties["name"];
+    const color = setColor(feature);
     if (!boardingsLookup[mapID]) { return }
-
-    const { percentChange, monthTotal2 } = boardingsLookup[mapID];
+    const { name, percentChange, monthTotal2 } = boardingsLookup[mapID];
 
     function highlightFeature(e: any) {
       const layer = e.target;
