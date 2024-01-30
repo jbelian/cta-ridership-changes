@@ -6,7 +6,7 @@ I drew inspiration for this from my previous project, [Bus Ridership Forecasting
 - ~~Add a legend for change in ridership, from blue (positive) to red (negative)~~ ✅
 - ~~More informative tooltips~~ ✅
 
-#### Ridership Info
+#### Data info from the CTA
 > **About CTA ridership numbers**  
 > Ridership statistics are provided on a system-wide and bus route/station-level basis. Ridership is primarily counted as boardings, that is, customers boarding a transit vehicle (bus or rail).  On the rail system, there is a distinction between station entries and total rides, or boardings. Datasets indicate such in their file name and description.
 >
