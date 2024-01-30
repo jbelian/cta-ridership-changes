@@ -8,6 +8,7 @@ export interface Boardings {
 
 // Additional properties added for comparison between two dates
 export interface CombinedBoardings extends Boardings {
+  [key: string]: any;
   monthTotal2: string;
   percentChange: string;
 }
