@@ -1,11 +1,11 @@
 // routeList.tsx
 
-import { CombinedRoutes } from "./trainStations.tsx";
+import { CombinedBoardings } from "../utils/dataHandlers.tsx";
 
 interface RouteSelectionProps {
   selectedDate1: string;
   selectedDate2: string;
-  filteredRoutes: CombinedRoutes[];
+  filteredRoutes: CombinedBoardings[];
 }
 
 const getYearAndMonthName = (dateString: string) => {
@@ -36,7 +36,7 @@ function RouteSelection(props: RouteSelectionProps) {
           </tr>
         </thead>
         <tbody>
-          {filteredRoutes.map((item: CombinedRoutes, index: number) => (
+          {filteredRoutes.map((item: CombinedBoardings, index: number) => (
             <tr key={index}>
               <td className="route-column">{item.id}</td>
               <td className="name-column">{item.name}</td>
