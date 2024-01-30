@@ -38,6 +38,22 @@ main,
   text-align: left;
 }
 
+button {
+  display: inline-block !important;
+  outline: 0 !important;
+  border: 0 !important;
+  cursor: pointer !important;
+  background-color: #3d8d6d !important;
+  border-radius: 4px !important;
+  padding: 8px 16px !important;
+  font-size: 16px !important;
+  border-bottom: 4px solid #236350 !important;
+  font-weight: 700 !important;
+  color: #FFFAFE !important;
+  line-height: 26px !important;
+}
+
+
 .name-column,
 .name-column th,
 .name-column td {
