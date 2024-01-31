@@ -1,5 +1,3 @@
-// map.tsx
-
 import { MapContainer, TileLayer, GeoJSON, useMap } from "react-leaflet";
 import { Feature, FeatureCollection, Geometry } from "geojson";
 import L from "leaflet";
@@ -71,18 +69,16 @@ const Legend = () => {
   return null;
 };
 
-const Map = ({ keyProp, toggleTransitData, boardings }:
-  { boardings: CombinedBoardings[]; keyProp: string; toggleTransitData: boolean }) => {
-  const boardingsPairs = boardings.map(boarding => { return [boarding["id"], boarding]; });
-  const boardingsLookup = Object.fromEntries(boardingsPairs);
-  const boardingsSet = new Set(
-    boardings
-      .filter(boarding => boarding.percentChange && boarding.percentChange.trim() !== '')
-      .map(boarding => boarding.id)
+const Map = ({ mapKey, toggle, boardings }:
+  { boardings: CombinedBoardings[]; mapKey: string; toggle: boolean }) => {
+  const boardingsLookup = Object.fromEntries(boardings.map(boarding => [boarding.id, boarding]));
+  const boardingsSet = new Set(boardings
+    .filter(boarding => boarding.percentChange?.trim())
+    .map(boarding => boarding.id)
   );
 
-  const boardingsMap = toggleTransitData ? busMap : stationMap;
-  const mapID = toggleTransitData ? "ROUTE" : "Station ID";
+  const boardingsMap = toggle ? busMap : stationMap;
+  const mapID = toggle ? "ROUTE" : "Station ID";
   const matchingBoardings = {
     type: "FeatureCollection",
     features: boardingsMap.features.filter((feature) =>
@@ -91,7 +87,7 @@ const Map = ({ keyProp, toggleTransitData, boardings }:
   } as FeatureCollection;
 
   function onEachBoarding(feature: Feature<Geometry, any>, layer: any) {
-    const mapID = feature.properties[toggleTransitData ? "ROUTE" : "Station ID"];
+    const mapID = feature.properties[toggle ? "ROUTE" : "Station ID"];
     const color = setColor(feature);
     if (!boardingsLookup[mapID]) { return }
     const { name, percentChange, monthTotal2 } = boardingsLookup[mapID];
@@ -122,7 +118,7 @@ const Map = ({ keyProp, toggleTransitData, boardings }:
   }
 
   function setColor(feature: Feature<Geometry, any>) {
-    const mapID = feature.properties[toggleTransitData ? "ROUTE" : "Station ID"];
+    const mapID = feature.properties[toggle ? "ROUTE" : "Station ID"];
     const matchingBoarding = boardingsLookup[mapID];
     if (!matchingBoarding) { return "#000" }
 
@@ -140,12 +136,12 @@ const Map = ({ keyProp, toggleTransitData, boardings }:
                     &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url={`https://{s}.tile.jawg.io/jawg-dark/{z}/{x}/{y}{r}.png?access-token=${jawgToken}`}
       />
-      {!toggleTransitData && <RailLines />}
+      {!toggle && <RailLines />}
       <GeoJSON
-        key={keyProp}
+        key={mapKey}
         data={matchingBoardings}
         pointToLayer={(feature, latlng) => {
-          const mapID = feature.properties[toggleTransitData ? "ROUTE" : "Station ID"];
+          const mapID = feature.properties[toggle ? "ROUTE" : "Station ID"];
           const matchingBoarding = boardingsLookup[mapID];
           let radius = 8;
           if (matchingBoarding && matchingBoarding.monthTotal2) {

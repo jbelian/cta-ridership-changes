@@ -1,5 +1,3 @@
-//boardings.tsx
-
 import { Boardings, CombinedBoardings } from '../utils/dataHandlers.tsx';
 
 // Sorts by boarding number in numeric order, ignoring letters, for example:
@@ -19,7 +17,7 @@ function compareBoardings(a: CombinedBoardings, b: CombinedBoardings): number {
   });
 }
 
-export const parseBoardingData = (
+export const parseBoardings = (
   selectedDate1: string,
   selectedDate2: string,
   boardingData: Boardings[]

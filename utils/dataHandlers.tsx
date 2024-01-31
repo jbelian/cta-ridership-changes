@@ -14,8 +14,8 @@ export interface CombinedBoardings extends Boardings {
 }
 
 // Map the incoming station data to boardings
-export const assignTrainStationData = (data: any): Boardings[] => {
-  const stations = data.map((item: any) => {
+export const assignStation = (data: any): Boardings[] => {
+  const boardings = data.map((item: any) => {
     return {
       id: item.station_id,
       name: item.stationame,
@@ -23,12 +23,12 @@ export const assignTrainStationData = (data: any): Boardings[] => {
       monthTotal: item.monthtotal,
     };
   });
-  return stations;
+  return boardings;
 }
 
 // Map the incoming bus JSON data to boardings
-export const assignBusRouteData = (data: any): Boardings[] => {
-  const routes = data.map((item: any) => {
+export const assignBus = (data: any): Boardings[] => {
+  const boardings = data.map((item: any) => {
     return {
       id: item.route,
       name: item.routename,
@@ -36,5 +36,5 @@ export const assignBusRouteData = (data: any): Boardings[] => {
       monthTotal: item.monthtotal,
     };
   });
-  return routes;
+  return boardings;
 }

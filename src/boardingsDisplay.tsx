@@ -12,30 +12,30 @@ const getYearAndMonthName = (dateString: string) => {
 function BoardingsDisplay({
   selectedDate1,
   selectedDate2,
-  filteredBoardings,
-  toggleTransitData
+  boardings,
+  toggle
 }: {
   selectedDate1: string;
   selectedDate2: string;
-  filteredBoardings: CombinedBoardings[];
-  toggleTransitData: boolean;
+  boardings: CombinedBoardings[];
+  toggle: boolean;
 }) {
   return (
     <div>
       <table>
         <thead>
           <tr>
-            {toggleTransitData && <th className="route-column">Route</th>}
-            <th className="name-column">{toggleTransitData ? 'Bus' : 'Train Station'}</th>
+            {toggle && <th className="route-column">Route</th>}
+            <th className="name-column">{toggle ? 'Bus' : 'Train Station'}</th>
             <th className="number-column">{getYearAndMonthName(selectedDate1)}</th>
             <th className="number-column">{getYearAndMonthName(selectedDate2)}</th>
             <th className="change-column">Change</th>
           </tr>
         </thead>
         <tbody>
-          {filteredBoardings.map((item: CombinedBoardings, index: number) => (
+          {boardings.map((item: CombinedBoardings, index: number) => (
             <tr key={index}>
-              {toggleTransitData && <td className="route-column">{item.id}</td>}
+              {toggle && <td className="route-column">{item.id}</td>}
               <td className="name-column">{item.name}</td>
               <td className="number-column">{item.monthTotal}</td>
               <td className="number-column">{item.monthTotal2}</td>

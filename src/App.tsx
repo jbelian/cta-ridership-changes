@@ -1,28 +1,18 @@
-// App.tsx
-
 import React, { useEffect, useState } from "react";
-import BoardingsSelection from "./routeList.tsx";
+import BoardingsDisplay from "./boardingsDisplay.tsx";
 import Map from "./map.tsx";
 import busData from "../data/busData.json";
 import stationData from "../data/stationData.json";
 import lastModified from "../data/lastModified.json";
-import { assignTrainStationData, assignBusRouteData, Boardings, CombinedBoardings } from '../utils/dataHandlers.tsx';
-import { parseBoardingData } from "./boardings.tsx";
+import { assignStation, assignBus, Boardings, CombinedBoardings } from '../utils/dataHandlers.tsx';
+import { parseBoardings } from "./boardings.tsx";
 
 const START_DATE = "2001-01";
 const GIST_URL = 'https://api.github.com/gists/cfe1d1c07128822245c55596e7e60971';
 
 const App = () => {
-  // The most recent month of data is used as the end date for the date selector
-  const lastMonth = lastModified.lastMonth
-
   // Fetch last date of fetch from gist
   const [lastFetchedChicago, setLastFetchedChicago] = useState("");
-
-  // Toggle between train station and bus data, initialized to train
-  const [toggleTransitData, setToggleTransitData] = useState(false);
-
-  // Simply updates the last fetch time
   useEffect(() => {
     const fetchGist = async () => {
       const response = await fetch(GIST_URL);
@@ -44,28 +34,33 @@ const App = () => {
     fetchGist();
   }, []);
 
+  // Toggle between train station and bus data, initialized to train
+  const [toggle, setToggle] = useState(false);
+
   // Assign bus or train as boarding data, then filter by date and return combined data
-  const assignBoardingData = (selectedDate1: string, selectedDate2: string, toggleTransitData: boolean): CombinedBoardings[] => {
-    const boardingData: Boardings[] = toggleTransitData ? assignBusRouteData(busData) : assignTrainStationData(stationData);
-    const combinedFilteredBoardingData: CombinedBoardings[] = parseBoardingData(selectedDate1, selectedDate2, boardingData);
-    return combinedFilteredBoardingData;
+  const assignBoarding = (selectedDate1: string, selectedDate2: string, toggle: boolean): CombinedBoardings[] => {
+    const boardings: Boardings[] = toggle ? assignBus(busData) : assignStation(stationData);
+    const combinedBoardings: CombinedBoardings[] = parseBoardings(selectedDate1, selectedDate2, boardings);
+    return combinedBoardings;
   };
 
   // Start and end dates for date selector
+  const lastMonth = lastModified.lastMonth
   const [selectedDate1, setSelectedDate1] = useState("2001-01");
   const [selectedDate2, setSelectedDate2] = useState(lastMonth);
 
   // Key prop for map component state management
-  const [key, setKey] = useState(`${selectedDate1}-${selectedDate2}`);
+  const [mapKey, setMapKey] = useState(`${selectedDate1}-${selectedDate2}`);
 
-  // Update combinedFilteredBoardingData when date or transit toggle changes
-  const [combinedFilteredBoardingData, setCombinedFilteredBoardingData] = useState<CombinedBoardings[]>(assignBoardingData(selectedDate1, selectedDate2, toggleTransitData));
+  // Update combinedBoardings when date or transit toggle changes
+  const [combinedBoardings, setCombinedBoardings] =
+    useState<CombinedBoardings[]>(assignBoarding(selectedDate1, selectedDate2, toggle));
 
   // Use states for boarding data
   useEffect(() => {
-    const newBoardingData = assignBoardingData(selectedDate1, selectedDate2, toggleTransitData);
-    setCombinedFilteredBoardingData(newBoardingData);
-  }, [selectedDate1, selectedDate2, toggleTransitData]);
+    const newBoardings = assignBoarding(selectedDate1, selectedDate2, toggle);
+    setCombinedBoardings(newBoardings);
+  }, [selectedDate1, selectedDate2, toggle]);
 
   // Handler for date selector
   const dateChangeHandler = (index: number, setter: React.Dispatch<React.SetStateAction<string>>) =>
@@ -74,20 +69,23 @@ const App = () => {
       if (newValue < START_DATE || newValue > lastMonth) {
         setSelectedDate1(START_DATE);
         setSelectedDate2(lastMonth);
-        setKey(START_DATE + `-${lastMonth}`);
+        setMapKey(START_DATE + `-${lastMonth}`);
       } else {
         setter(newValue);
-        setKey(index === 0 ? `${newValue}-${selectedDate2}` : `${selectedDate1}-${newValue}`);
+        setMapKey(index === 0 ? `${newValue}-${selectedDate2}` : `${selectedDate1}-${newValue}`);
       }
     };
 
-  const toggleTransitDataHandler = () => {
-    setToggleTransitData(prevToggleTransitData => !prevToggleTransitData);
-    // Update keyProp to force re-render of Map component
-    setKey(prevKey => prevKey + '-toggle');
+  const toggleHandler = () => {
+    const newToggle = !toggle;
+    setToggle(newToggle);
+
+    // Update mapKey based on selectedDate1, selectedDate2, and newtoggle
+    setMapKey(`${selectedDate1}-${selectedDate2}-${newToggle}`);
+
     // Trigger a re-fetch of the boarding data
-    const newBoardingData = assignBoardingData(selectedDate1, selectedDate2, !toggleTransitData);
-    setCombinedFilteredBoardingData(newBoardingData);
+    const newBoardings = assignBoarding(selectedDate1, selectedDate2, newToggle);
+    setCombinedBoardings(newBoardings);
   };
 
   return (
@@ -110,20 +108,23 @@ const App = () => {
               </div>
             ))}
           </label>
-          <button onClick={toggleTransitDataHandler}>
-            {toggleTransitData ? 'Show Train Stations' : 'Show Bus Routes'}
+          <button onClick={toggleHandler}>
+            {toggle ? 'Show Train Stations' : 'Show Bus Routes'}
           </button>
         </div>
-        <BoardingsSelection
+        <BoardingsDisplay
           selectedDate1={selectedDate1}
           selectedDate2={selectedDate2}
-          filteredBoardings={combinedFilteredBoardingData}
-          toggleTransitData={toggleTransitData}
+          boardings={combinedBoardings}
+          toggle={toggle}
         />
       </aside>
       <main>
-        {combinedFilteredBoardingData.length > 0 &&
-          <Map keyProp={key} toggleTransitData={toggleTransitData} boardings={combinedFilteredBoardingData} />
+        {combinedBoardings.length > 0 &&
+          <Map
+            mapKey={mapKey}
+            toggle={toggle}
+            boardings={combinedBoardings} />
         }
       </main>
     </div>
