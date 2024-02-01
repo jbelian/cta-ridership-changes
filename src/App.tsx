@@ -49,9 +49,6 @@ const App = () => {
   const [selectedDate1, setSelectedDate1] = useState("2001-01");
   const [selectedDate2, setSelectedDate2] = useState(lastMonth);
 
-  // Key prop for map component state management
-  const [mapKey, setMapKey] = useState(`${selectedDate1}-${selectedDate2}`);
-
   // Update combinedBoardings when date or transit toggle changes
   const [combinedBoardings, setCombinedBoardings] =
     useState<CombinedBoardings[]>(assignBoarding(selectedDate1, selectedDate2, toggle));
@@ -63,25 +60,20 @@ const App = () => {
   }, [selectedDate1, selectedDate2, toggle]);
 
   // Handler for date selector
-  const dateChangeHandler = (index: number, setter: React.Dispatch<React.SetStateAction<string>>) =>
+  const dateChangeHandler = (setter: React.Dispatch<React.SetStateAction<string>>) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = event.target.value;
       if (newValue < START_DATE || newValue > lastMonth) {
         setSelectedDate1(START_DATE);
         setSelectedDate2(lastMonth);
-        setMapKey(START_DATE + `-${lastMonth}`);
       } else {
         setter(newValue);
-        setMapKey(index === 0 ? `${newValue}-${selectedDate2}` : `${selectedDate1}-${newValue}`);
       }
     };
 
   const toggleHandler = () => {
     const newToggle = !toggle;
     setToggle(newToggle);
-
-    // Update mapKey based on selectedDate1, selectedDate2, and newtoggle
-    setMapKey(`${selectedDate1}-${selectedDate2}-${newToggle}`);
 
     // Trigger a re-fetch of the boarding data
     const newBoardings = assignBoarding(selectedDate1, selectedDate2, newToggle);
@@ -103,7 +95,7 @@ const App = () => {
                   min={START_DATE}
                   max={lastMonth}
                   value={selectedDate}
-                  onChange={dateChangeHandler(index, index === 0 ? setSelectedDate1 : setSelectedDate2)}
+                  onChange={dateChangeHandler(index === 0 ? setSelectedDate1 : setSelectedDate2)}
                 />
               </div>
             ))}
@@ -122,9 +114,9 @@ const App = () => {
       <main>
         {combinedBoardings.length > 0 &&
           <Map
-            mapKey={mapKey}
+            boardings={combinedBoardings.filter(boarding => boarding.percentChange !== "")}
             toggle={toggle}
-            boardings={combinedBoardings} />
+          />
         }
       </main>
     </div>
