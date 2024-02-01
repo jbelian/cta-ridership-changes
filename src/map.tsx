@@ -72,10 +72,8 @@ const Legend = () => {
 function setColor(boardingsLookup: any, mapID: string,) {
   const matchingBoarding = boardingsLookup[mapID];
   if (!matchingBoarding) { return "#000" }
-
   const percentChange = parseFloat(matchingBoarding.percentChange);
   const colorThreshold = colorThresholds.find(threshold => percentChange >= threshold.threshold);
-
   return colorThreshold ? colorThreshold.color : "#000";
 }
 
@@ -84,14 +82,25 @@ function onEachBoarding(feature: Feature<Geometry, any>, layer: any, boardingsLo
   const color = setColor(boardingsLookup, id);
   if (!boardingsLookup[id]) { return }
   const { name, percentChange, monthTotal2 } = boardingsLookup[id];
-  layer.bindTooltip(`${name}<br/>${monthTotal2} boardings<br/>${percentChange}% change`);
-
+  const tooltip = L.tooltip({
+    offset: L.point(0, -20),
+    direction: 'top',
+    permanent: false,
+    opacity: 1,
+    className: 'tooltip'
+  }).setContent(`${name}<br/>${monthTotal2} boardings<br/>${percentChange}% change`);
+  layer.bindTooltip(tooltip);
   layer.setStyle({ weight: 3, color: color });
   layer.on({
-    mouseover: () => {
+    mouseover: (e: { latlng: any; }) => {
       layer.setStyle({ weight: 5, color: "#7F0" });
       layer.bringToFront();
-    }, mouseout: () => layer.setStyle({ weight: 3, color: color }),
+      layer.openTooltip(e.latlng);
+    },
+    mouseout: () => {
+      layer.setStyle({ weight: 3, color: color });
+      layer.closeTooltip();
+    },
   });
 }
 
