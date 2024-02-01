@@ -1,7 +1,7 @@
 import { MapContainer, TileLayer, GeoJSON, useMap } from "react-leaflet";
 import { Feature, FeatureCollection, Geometry } from "geojson";
 import L from "leaflet";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import "leaflet/dist/leaflet.css";
 import "./App.css";
 import RailLines from './railLines.tsx'
@@ -10,8 +10,10 @@ import busMap from '../data/busMap.json';
 import { CombinedBoardings } from '../utils/dataHandlers.tsx';
 
 const jawgToken = import.meta.env.VITE_APP_JAWG_TOKEN;
+const legendGrades = [500, 354, 251, 178, 126, 95, 85, 75, 65, 55, 45, 35, 25, 15, 5, 0, -5, -15, -25, -35, -45, -55, -65, -75, -85, -95];
+const legendText = ["1000%", "", "", "", "", "100%", "", "", "", "", "50%", "", "", "", "", "0%", "", "", "", "", "-50%", "", "", "", "", "-100%"]
 
-// Colorblind friendly colors for -100% to 100% derived from
+// Colorblind friendly colors from -100% to 100% derived from
 // "sunset" color scheme here https://personal.sron.nl/~pault/
 // Hot pink added for exponential tail of numbers above 100%
 const colorThresholds = [
@@ -50,15 +52,13 @@ const Legend = () => {
     const legend = new L.Control({ position: "topright" })
     function getColor(d: number) {
       const colorThreshold = colorThresholds.find(threshold => d >= threshold.threshold);
-      return colorThreshold ? colorThreshold.color : "#FFFFFF";
+      return colorThreshold ? colorThreshold.color : "#FFF";
     }
     legend.onAdd = () => {
       const div = L.DomUtil.create("div", "info legend");
-      const grades = [500, 354, 251, 178, 126, 95, 85, 75, 65, 55, 45, 35, 25, 15, 5, 0, -5, -15, -25, -35, -45, -55, -65, -75, -85, -95];
-      const text = ["1000%", "", "", "", "", "100%", "", "", "", "", "50%", "", "", "", "", "0%", "", "", "", "", "-50%", "", "", "", "", "-100%"]
-      const labels = grades.map((grade, i) =>
+      const labels = legendGrades.map((grade, text) =>
         '<div style="line-height: 14px;"><i style="background:' + getColor(grade) +
-        '; width: 13px; height: 13px; display: inline-block; vertical-align: top;"></i> ' + text[i] + '</div>'
+        '; width: 13px; height: 13px; display: inline-block; vertical-align: top;"></i> ' + legendText[text] + '</div>'
       );
       div.innerHTML = labels.join("");
       return div;
@@ -69,65 +69,51 @@ const Legend = () => {
   return null;
 };
 
-const Map = ({ mapKey, toggle, boardings }:
-  { boardings: CombinedBoardings[]; mapKey: string; toggle: boolean }) => {
-  const boardingsLookup = Object.fromEntries(boardings.map(boarding => [boarding.id, boarding]));
-  const boardingsSet = new Set(boardings
-    .filter(boarding => boarding.percentChange?.trim())
-    .map(boarding => boarding.id)
-  );
+function setColor(boardingsLookup: any, mapID: string,) {
+  const matchingBoarding = boardingsLookup[mapID];
+  if (!matchingBoarding) { return "#000" }
 
-  const boardingsMap = toggle ? busMap : stationMap;
-  const mapID = toggle ? "ROUTE" : "Station ID";
-  const matchingBoardings = {
-    type: "FeatureCollection",
-    features: boardingsMap.features.filter((feature) =>
-      boardingsSet.has(String((feature.properties as any)[mapID]))
-    ),
-  } as FeatureCollection;
+  const percentChange = parseFloat(matchingBoarding.percentChange);
+  const colorThreshold = colorThresholds.find(threshold => percentChange >= threshold.threshold);
 
-  function onEachBoarding(feature: Feature<Geometry, any>, layer: any) {
-    const mapID = feature.properties[toggle ? "ROUTE" : "Station ID"];
-    const color = setColor(feature);
-    if (!boardingsLookup[mapID]) { return }
-    const { name, percentChange, monthTotal2 } = boardingsLookup[mapID];
+  return colorThreshold ? colorThreshold.color : "#000";
+}
 
-    function highlightFeature(e: any) {
-      const layer = e.target;
+function onEachBoarding(feature: Feature<Geometry, any>, layer: any, boardingsLookup: any, mapID: string,) {
+  const id = String((feature.properties as any)[mapID]);
+  const color = setColor(boardingsLookup, id);
+  if (!boardingsLookup[id]) { return }
+  const { name, percentChange, monthTotal2 } = boardingsLookup[id];
+  layer.bindTooltip(`${name}<br/>${monthTotal2} boardings<br/>${percentChange}% change`);
+
+  layer.setStyle({ weight: 3, color: color });
+  layer.on({
+    mouseover: () => {
+      layer.setStyle({ weight: 5, color: "#7F0" });
       layer.bringToFront();
-      layer.setStyle({
-        weight: 5,
-        color: "#7F0"
-      });
-    };
+    }, mouseout: () => layer.setStyle({ weight: 3, color: color }),
+  });
+}
 
-    function resetHighlight(e: any) {
-      e.target.setStyle({
-        weight: 3,
-        color: color,
-      });
-    }
+const Map = ({ toggle, boardings }:
+  { boardings: CombinedBoardings[]; toggle: boolean }) => {
+  // toggle determines which map to use as well as the ID name of each feature
+  const map = toggle ? busMap : stationMap
+  const mapID = toggle ? "ROUTE" : "Station ID";
 
-    layer.on({ mouseover: highlightFeature, mouseout: resetHighlight });
-    layer.bindTooltip(`${name}<br/>${monthTotal2} boardings<br/>${percentChange}% change`,
-      { sticky: true, direction: 'auto' });
-    layer.setStyle({
-      weight: 3,
-      color: color,
-    });
-  }
+  // boardingsLookup is used for quick feature and color assignment
+  // matchingBoardings filters the map data to only include features with boarding data
+  const { boardingsLookup, matchingBoardings } = useMemo(() => {
+    const boardingsLookup = Object.fromEntries(boardings.map(boarding => [boarding.id, boarding]));
+    const matchingBoardings = {
+      type: "FeatureCollection",
+      features: map.features.filter((feature) =>
+        boardings.some(boarding => boarding.id === String((feature.properties as any)[mapID]))
+      )
+    } as FeatureCollection;
 
-  function setColor(feature: Feature<Geometry, any>) {
-    const mapID = feature.properties[toggle ? "ROUTE" : "Station ID"];
-    const matchingBoarding = boardingsLookup[mapID];
-    if (!matchingBoarding) { return "#000" }
-
-    const percentChange = parseFloat(matchingBoarding.percentChange);
-    const colorThreshold = colorThresholds.find(threshold => percentChange >= threshold.threshold);
-    return colorThreshold ? colorThreshold.color : "#FFF";
-  }
-
-  if (!boardings || boardings.length === 0) { return <div>Loading...</div> }
+    return { boardingsLookup, matchingBoardings };
+  }, [boardings, toggle]);
 
   return (
     <MapContainer center={[41.8781, -87.63]} zoom={13}>
@@ -138,25 +124,25 @@ const Map = ({ mapKey, toggle, boardings }:
       />
       {!toggle && <RailLines />}
       <GeoJSON
-        key={mapKey}
+        key={JSON.stringify(boardingsLookup)}
         data={matchingBoardings}
         pointToLayer={(feature, latlng) => {
-          const mapID = feature.properties[toggle ? "ROUTE" : "Station ID"];
-          const matchingBoarding = boardingsLookup[mapID];
+          const id = feature.properties[mapID];
+          const matchingBoarding = boardingsLookup[id];
           let radius = 8;
           if (matchingBoarding && matchingBoarding.monthTotal2) {
             radius = Math.sqrt(parseFloat(matchingBoarding.monthTotal2)) * .03;
           }
           return L.circleMarker(latlng, {
             radius: radius,
-            fillColor: setColor(feature),
+            fillColor: setColor(boardingsLookup, id),
             color: "#0F0",
             weight: 1,
             opacity: 1,
             fillOpacity: 0.8,
           });
         }}
-        onEachFeature={onEachBoarding}
+        onEachFeature={(feature, layer) => onEachBoarding(feature, layer, boardingsLookup, mapID)}
       />
       <Legend />
     </MapContainer>
