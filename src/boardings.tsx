@@ -1,4 +1,4 @@
-import { Boardings, CombinedBoardings } from '../utils/dataHandlers.tsx';
+import { Boardings, CombinedBoardings } from "../utils/dataHandlers.tsx";
 
 // Sorts by boarding number in numeric order, ignoring letters, for example:
 // 31   31st
@@ -7,7 +7,8 @@ import { Boardings, CombinedBoardings } from '../utils/dataHandlers.tsx';
 // X98	Avon Express
 // 111A	Pullman Shuttle
 function compareBoardings(a: CombinedBoardings, b: CombinedBoardings): number {
-  const removeNonNumeric = (boarding: string): string => boarding.replace(/\D/g, "");
+  const removeNonNumeric = (boarding: string): string =>
+    boarding.replace(/\D/g, "");
 
   const numericPartA = removeNonNumeric(a.id);
   const numericPartB = removeNonNumeric(b.id);
@@ -22,7 +23,6 @@ export const parseBoardings = (
   selectedDate2: string,
   boardingData: Boardings[]
 ) => {
-
   const returnSelectedDate = (date: string) => {
     return boardingData.filter((item) => {
       return date === item.monthBeginning.substring(0, 7);

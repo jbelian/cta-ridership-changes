@@ -3,7 +3,7 @@ import { Feature, FeatureCollection, Geometry } from "geojson";
 import L from "leaflet";
 import { useEffect, useMemo } from "react";
 import "leaflet/dist/leaflet.css";
-import "./App.css";
+import "./map.css";
 import RailLines from './railLines.tsx'
 import stationMap from '../data/stationMap.json';
 import busMap from '../data/busMap.json';
@@ -86,8 +86,7 @@ function onEachBoarding(feature: Feature<Geometry, any>, layer: any, boardingsLo
     offset: L.point(0, -20),
     direction: 'top',
     permanent: false,
-    opacity: 1,
-    className: 'tooltip'
+    opacity: 1
   }).setContent(`${name}<br/>${monthTotal2} boardings<br/>${percentChange}% change`);
   layer.bindTooltip(tooltip);
   layer.setStyle({ weight: 3, color: color });
