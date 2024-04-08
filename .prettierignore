@@ -1,3 +1,4 @@
-# Ignore artifacts:
+# Ignoring these directories
 build
 coverage
+data
