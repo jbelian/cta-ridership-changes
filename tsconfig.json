@@ -23,10 +23,9 @@
     /* Type checking */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@utils/*": ["./utils/*"]
+      "@/*": ["./src/*"]
     }
   },
-  "include": ["src", "utils"],
+  "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

@@ -24,7 +24,7 @@ export const assignStation = (data: any): Boardings[] => {
     };
   });
   return boardings;
-}
+};
 
 // Map the incoming bus JSON data to boardings
 export const assignBus = (data: any): Boardings[] => {
@@ -37,4 +37,4 @@ export const assignBus = (data: any): Boardings[] => {
     };
   });
   return boardings;
-}
+};
