@@ -1,4 +1,4 @@
-import { Boardings, CombinedBoardings } from "../utils/dataHandlers.tsx";
+import { Boardings, CombinedBoardings } from "./utils/dataHandlers.tsx";
 
 // Sorts by boarding number in numeric order, ignoring letters, for example:
 // 31   31st
@@ -19,13 +19,17 @@ function compareBoardings(a: CombinedBoardings, b: CombinedBoardings): number {
 }
 
 export const parseBoardings = (
-  selectedDate1: string,
-  selectedDate2: string,
-  boardingData: Boardings[]
+  selectedDate1: Date,
+  selectedDate2: Date,
+  boardingData: Boardings[],
 ) => {
-  const returnSelectedDate = (date: string) => {
+  const returnSelectedDate = (date: Date) => {
     return boardingData.filter((item) => {
-      return date === item.monthBeginning.substring(0, 7);
+      const boardingDate = new Date(item.monthBeginning);
+      return (
+        date.getFullYear() === boardingDate.getFullYear() &&
+        date.getMonth() === boardingDate.getMonth()
+      );
     });
   };
 
@@ -42,7 +46,7 @@ export const parseBoardings = (
   // Collects boardings found in both selected dates and those found only in the first
   filteredBoardings1.forEach((item1) => {
     const matchingItem2 = filteredBoardings2.find(
-      (item2) => item2.id === item1.id
+      (item2) => item2.id === item1.id,
     );
 
     const i: string = item1.monthTotal;
@@ -68,7 +72,7 @@ export const parseBoardings = (
   // Collects boardings found only in the second selected date
   filteredBoardings2.forEach((item2) => {
     const matchingItem1 = filteredBoardings1.find(
-      (item1) => item1.id === item2.id
+      (item1) => item1.id === item2.id,
     );
     if (!matchingItem1) {
       onlyFilteredBoardings2.push({
