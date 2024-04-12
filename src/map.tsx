@@ -4,14 +4,20 @@ import L from "leaflet";
 import { useEffect, useMemo } from "react";
 import "leaflet/dist/leaflet.css";
 import "./map.css";
-import RailLines from './railLines.tsx'
-import stationMap from '../data/stationMap.json';
-import busMap from '../data/busMap.json';
-import { CombinedBoardings } from '../utils/dataHandlers.tsx';
+import RailLines from "./railLines.tsx";
+import stationMap from "../data/stationMap.json";
+import busMap from "../data/busMap.json";
+import { CombinedBoardings } from "./utils/dataHandlers.tsx";
 
 const jawgToken = import.meta.env.VITE_APP_JAWG_TOKEN;
-const legendGrades = [500, 354, 251, 178, 126, 95, 85, 75, 65, 55, 45, 35, 25, 15, 5, 0, -5, -15, -25, -35, -45, -55, -65, -75, -85, -95];
-const legendText = ["1000%", "", "", "", "", "100%", "", "", "", "", "50%", "", "", "", "", "0%", "", "", "", "", "-50%", "", "", "", "", "-100%"]
+const legendGrades = [
+  500, 354, 251, 178, 126, 95, 85, 75, 65, 55, 45, 35, 25, 15, 5, 0, -5, -15,
+  -25, -35, -45, -55, -65, -75, -85, -95,
+];
+// prettier-ignore
+const legendText = [
+  "1000%","","","","","100%","","","","","50%","","","","","0%","","","","","-50%","","","","","-100%",
+];
 
 // Colorblind friendly colors from -100% to 100% derived from
 // "sunset" color scheme here https://personal.sron.nl/~pault/
@@ -49,16 +55,22 @@ const Legend = () => {
   const map = useMap();
 
   useEffect(() => {
-    const legend = new L.Control({ position: "topright" })
+    const legend = new L.Control({ position: "topright" });
     function getColor(d: number) {
-      const colorThreshold = colorThresholds.find(threshold => d >= threshold.threshold);
+      const colorThreshold = colorThresholds.find(
+        (threshold) => d >= threshold.threshold,
+      );
       return colorThreshold ? colorThreshold.color : "#FFF";
     }
     legend.onAdd = () => {
       const div = L.DomUtil.create("div", "info legend");
-      const labels = legendGrades.map((grade, text) =>
-        '<div style="line-height: 14px;"><i style="background:' + getColor(grade) +
-        '; width: 13px; height: 13px; display: inline-block; vertical-align: top;"></i> ' + legendText[text] + '</div>'
+      const labels = legendGrades.map(
+        (grade, text) =>
+          '<div style="line-height: 14px;"><i style="background:' +
+          getColor(grade) +
+          '; width: 13px; height: 13px; display: inline-block; vertical-align: top;"></i> ' +
+          legendText[text] +
+          "</div>",
       );
       div.innerHTML = labels.join("");
       return div;
@@ -69,29 +81,42 @@ const Legend = () => {
   return null;
 };
 
-function setColor(boardingsLookup: any, mapID: string,) {
+function setColor(boardingsLookup: any, mapID: string) {
   const matchingBoarding = boardingsLookup[mapID];
-  if (!matchingBoarding) { return "#000" }
+  if (!matchingBoarding) {
+    return "#000";
+  }
   const percentChange = parseFloat(matchingBoarding.percentChange);
-  const colorThreshold = colorThresholds.find(threshold => percentChange >= threshold.threshold);
+  const colorThreshold = colorThresholds.find(
+    (threshold) => percentChange >= threshold.threshold,
+  );
   return colorThreshold ? colorThreshold.color : "#000";
 }
 
-function onEachBoarding(feature: Feature<Geometry, any>, layer: any, boardingsLookup: any, mapID: string,) {
+function onEachBoarding(
+  feature: Feature<Geometry, any>,
+  layer: any,
+  boardingsLookup: any,
+  mapID: string,
+) {
   const id = String((feature.properties as any)[mapID]);
   const color = setColor(boardingsLookup, id);
-  if (!boardingsLookup[id]) { return }
+  if (!boardingsLookup[id]) {
+    return;
+  }
   const { name, percentChange, monthTotal2 } = boardingsLookup[id];
   const tooltip = L.tooltip({
     offset: L.point(0, -20),
-    direction: 'top',
+    direction: "top",
     permanent: false,
-    opacity: 1
-  }).setContent(`${name}<br/>${monthTotal2} boardings<br/>${percentChange}% change`);
+    opacity: 1,
+  }).setContent(
+    `${name}<br/>${monthTotal2} boardings<br/>${percentChange}% change`,
+  );
   layer.bindTooltip(tooltip);
   layer.setStyle({ weight: 3, color: color });
   layer.on({
-    mouseover: (e: { latlng: any; }) => {
+    mouseover: (e: { latlng: any }) => {
       layer.setStyle({ weight: 5, color: "#7F0" });
       layer.bringToFront();
       layer.openTooltip(e.latlng);
@@ -103,21 +128,31 @@ function onEachBoarding(feature: Feature<Geometry, any>, layer: any, boardingsLo
   });
 }
 
-const Map = ({ toggle, boardings }:
-  { boardings: CombinedBoardings[]; toggle: boolean }) => {
+const Map = ({
+  toggle,
+  boardings,
+}: {
+  boardings: CombinedBoardings[];
+  toggle: boolean;
+}) => {
   // toggle determines which map to use as well as the ID name of each feature
-  const map = toggle ? busMap : stationMap
+  const map = toggle ? busMap : stationMap;
   const mapID = toggle ? "ROUTE" : "Station ID";
 
   // boardingsLookup is used for quick feature and color assignment
   // matchingBoardings filters the map data to only include features with boarding data
   const { boardingsLookup, matchingBoardings } = useMemo(() => {
-    const boardingsLookup = Object.fromEntries(boardings.map(boarding => [boarding.id, boarding]));
+    const boardingsLookup = Object.fromEntries(
+      boardings.map((boarding) => [boarding.id, boarding]),
+    );
     const matchingBoardings = {
       type: "FeatureCollection",
       features: map.features.filter((feature) =>
-        boardings.some(boarding => boarding.id === String((feature.properties as any)[mapID]))
-      )
+        boardings.some(
+          (boarding) =>
+            boarding.id === String((feature.properties as any)[mapID]),
+        ),
+      ),
     } as FeatureCollection;
 
     return { boardingsLookup, matchingBoardings };
@@ -139,7 +174,7 @@ const Map = ({ toggle, boardings }:
           const matchingBoarding = boardingsLookup[id];
           let radius = 8;
           if (matchingBoarding && matchingBoarding.monthTotal2) {
-            radius = Math.sqrt(parseFloat(matchingBoarding.monthTotal2)) * .03;
+            radius = Math.sqrt(parseFloat(matchingBoarding.monthTotal2)) * 0.03;
           }
           return L.circleMarker(latlng, {
             radius: radius,
@@ -150,7 +185,9 @@ const Map = ({ toggle, boardings }:
             fillOpacity: 0.8,
           });
         }}
-        onEachFeature={(feature, layer) => onEachBoarding(feature, layer, boardingsLookup, mapID)}
+        onEachFeature={(feature, layer) =>
+          onEachBoarding(feature, layer, boardingsLookup, mapID)
+        }
       />
       <Legend />
     </MapContainer>
