@@ -2,7 +2,7 @@
 export interface Boardings {
   id: string;
   name: string;
-  monthBeginning: string;
+  monthBeginning: Date;
   monthTotal: string;
 }
 
