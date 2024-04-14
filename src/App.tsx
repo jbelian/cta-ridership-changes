@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import BoardingsDisplay from "./boardingsDisplay.tsx";
 import Map from "./map.tsx";
 import busData from "../data/busData.json";
@@ -9,33 +9,30 @@ import {
   assignBus,
   Boardings,
   CombinedBoardings,
-} from "../utils/dataHandlers.tsx";
+} from "./utils/dataHandlers.tsx";
 import { parseBoardings } from "./boardings.tsx";
+import { Calendar } from "./components/calendar.tsx";
+import { Label } from "@/components/label";
+import { Switch } from "@/components/switch";
+import { Toggle } from "./components/toggle.tsx";
+import { MoonIcon, SunIcon } from "lucide-react";
+import "react-day-picker/dist/style.css";
 
-const START_DATE = "2001-01";
+const START_DATE = new Date(2001, 0);
+const [year, month] = lastModified.lastMonth.split("-");
+const END_DATE = new Date(parseInt(year), parseInt(month) - 1);
 const GIST_URL =
   "https://api.github.com/gists/cfe1d1c07128822245c55596e7e60971";
 
 const App = () => {
   // Fetch last date of fetch from gist
-  const [lastFetchedChicago, setLastFetchedChicago] = useState("");
+  const [lastFetched, setLastFetched] = useState<Date>();
   useEffect(() => {
     const fetchGist = async () => {
       const response = await fetch(GIST_URL);
       const data = await response.json();
-      const fileContent = data.files["lastFetched.json"].content;
-      const lastFetchedGMT = new Date(fileContent);
-      const formattedDate = lastFetchedGMT.toLocaleString("en-US", {
-        timeZone: "America/Chicago",
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: true,
-      });
-      setLastFetchedChicago(formattedDate);
+      const date = data.files["lastFetched.json"].content;
+      setLastFetched(new Date(date));
     };
     fetchGist();
   }, []);
@@ -43,11 +40,21 @@ const App = () => {
   // Toggle between train station and bus data, initialized to train
   const [toggle, setToggle] = useState(false);
 
+  // Toggle dark mode, initialized to dark
+  const [darkMode, setDarkMode] = useState(true);
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [darkMode]);
+
   // Assign bus or train as boarding data, then filter by date and return combined data
   const assignBoarding = (
-    selectedDate1: string,
-    selectedDate2: string,
-    toggle: boolean
+    selectedDate1: Date,
+    selectedDate2: Date,
+    toggle: boolean,
   ): CombinedBoardings[] => {
     const boardings: Boardings[] = toggle
       ? assignBus(busData)
@@ -55,15 +62,22 @@ const App = () => {
     const combinedBoardings: CombinedBoardings[] = parseBoardings(
       selectedDate1,
       selectedDate2,
-      boardings
+      boardings,
     );
     return combinedBoardings;
   };
 
   // Start and end dates for date selector
-  const lastMonth = lastModified.lastMonth;
-  const [selectedDate1, setSelectedDate1] = useState("2001-01");
-  const [selectedDate2, setSelectedDate2] = useState(lastMonth);
+  const [selectedDate1, setSelectedDate1] = useState(START_DATE);
+  const [selectedDate2, setSelectedDate2] = useState(END_DATE);
+  useEffect(() => {
+    if (selectedDate1 > END_DATE) {
+      setSelectedDate1(END_DATE);
+    }
+    if (selectedDate2 > END_DATE) {
+      setSelectedDate2(END_DATE);
+    }
+  }, [selectedDate1, selectedDate2]);
 
   // Update combinedBoardings when date or transit toggle changes
   const [combinedBoardings, setCombinedBoardings] = useState<
@@ -76,19 +90,6 @@ const App = () => {
     setCombinedBoardings(newBoardings);
   }, [selectedDate1, selectedDate2, toggle]);
 
-  // Handler for date selector
-  const dateChangeHandler =
-    (setter: React.Dispatch<React.SetStateAction<string>>) =>
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const newValue = event.target.value;
-      if (newValue < START_DATE || newValue > lastMonth) {
-        setSelectedDate1(START_DATE);
-        setSelectedDate2(lastMonth);
-      } else {
-        setter(newValue);
-      }
-    };
-
   const toggleHandler = () => {
     const newToggle = !toggle;
     setToggle(newToggle);
@@ -97,82 +98,138 @@ const App = () => {
     const newBoardings = assignBoarding(
       selectedDate1,
       selectedDate2,
-      newToggle
+      newToggle,
     );
     setCombinedBoardings(newBoardings);
   };
 
   return (
-    <div className="flex w-screen h-screen leading-relaxed text-yellow-50 bg-[#191a1a]">
-      <aside className="w-[650px] h-screen bg-[#1c1e1e] overflow-y-auto p-5">
-        <h1 className="text-6xl text-left font-bold pt-2 pb-8">
+    // consider div-relative, aside-absolute for "floating" effect of sidebar
+    <div className="flex h-screen w-screen bg-background leading-relaxed">
+      <aside
+        className="z-20 h-screen w-[525px] flex-shrink-0 overflow-y-auto bg-background"
+        style={{
+          boxShadow: "0 0 10px rgba(0, 0, 0, 1)",
+        }}
+      >
+        <h1 className="pb-8 pl-5 pr-5 pt-8 text-left text-6xl font-bold">
           CTA Ridership Changes
         </h1>
-        <div className="text-yellow-50 text-opacity-50">
-          <span>Updated </span>
-          <time dateTime={lastFetchedChicago}>
-            {new Date(lastModified.lastModified)
-              .toLocaleString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-                hour: "numeric",
-                minute: "numeric",
-                hour12: true,
-              })
-              .replace("AM", "a.m.")
-              .replace("PM", "p.m.")}
-          </time>
-          <br />
-          <span>Checked for new data </span>
-          <time>
-            {(() => {
-              const now = new Date();
-              const lastChecked = new Date(lastFetchedChicago);
-              const diffInMilliseconds = now.getTime() - lastChecked.getTime();
-              const diffInHours = Math.floor(
-                diffInMilliseconds / (1000 * 60 * 60)
-              );
-              return `${diffInHours} hours ago`;
-            })()}
-          </time>
+        <div className="flex items-center justify-between pb-10 pl-5 pr-5">
+          <div className="text-opacity-50">
+            <span>Updated </span>
+            <time dateTime={lastFetched?.toLocaleString()}>
+              {new Date(lastModified.lastModified)
+                .toLocaleString()
+                .replace("AM", "a.m.")
+                .replace("PM", "p.m.")}
+            </time>
+            <br />
+            {lastFetched ? (
+              <span>
+                {`Checked for updates `}
+                <time>
+                  {(() => {
+                    const now = new Date();
+                    const diffInMilliseconds =
+                      now.getTime() - lastFetched.getTime();
+                    const diffInMinutes = Math.floor(
+                      diffInMilliseconds / (1000 * 60),
+                    );
+                    if (diffInMinutes <= 1) {
+                      return `a moment ago`;
+                    }
+                    if (diffInMinutes < 60) {
+                      return `${diffInMinutes} minutes ago`;
+                    }
+                    if (diffInMinutes < 120) {
+                      return `an hour ago`;
+                    }
+                    if (diffInMinutes < 1440) {
+                      const diffInHours = Math.floor(diffInMinutes / 60);
+                      return `${diffInHours} hours ago`;
+                    }
+                    const diffInDays = Math.floor(diffInMinutes / (60 * 24));
+                    return diffInDays >= 1 && diffInDays < 2
+                      ? `a day ago`
+                      : `${diffInDays} days ago`;
+                  })()}
+                </time>
+              </span>
+            ) : (
+              <br />
+            )}
+          </div>
+          <div>
+            <Toggle
+              onClick={() => {
+                setDarkMode(!darkMode);
+              }}
+              className="hover:!text-muted-foreground data-[state=off]:bg-transparent data-[state=on]:bg-transparent"
+              aria-label="Toggle between light and dark mode"
+            >
+              {darkMode ? (
+                <MoonIcon className="h-4 w-4" />
+              ) : (
+                <SunIcon className="h-4 w-4" />
+              )}
+            </Toggle>
+          </div>
         </div>
-        <div className="flex justify-between items-end pt-5 pb-7">
-          <label>
-            Compare dates:
-            {[selectedDate1, selectedDate2].map((selectedDate, index) => (
-              <div key={index}>
-                <input
-                  name="date"
-                  type="month"
-                  min={START_DATE}
-                  max={lastMonth}
-                  value={selectedDate}
-                  onChange={dateChangeHandler(
-                    index === 0 ? setSelectedDate1 : setSelectedDate2
-                  )}
-                />
-              </div>
-            ))}
-          </label>
-          <button onClick={toggleHandler}>
-            {toggle ? "Show Train Stations" : "Show Bus Routes"}
-          </button>
+        <div className="sticky top-0 z-10 flex h-[70px] justify-between bg-background">
+          <div className="flex pl-5">
+            <div className="flex w-[170px] items-center space-x-2">
+              <Label htmlFor="transitToggle" className="text-right">
+                The "L"
+              </Label>
+              <Switch
+                onClick={toggleHandler}
+                className="data-[state=checked]:primary-foreground data-[state=unchecked]:primary-foreground border-[1px] border-muted-foreground/30"
+                aria-label="Toggle between train (the L) data and bus data"
+              />
+              <Label htmlFor="transitToggle">The Bus</Label>
+            </div>
+          </div>
+          <div className="flex items-center justify-end">
+            <Calendar
+              mode="single"
+              defaultMonth={START_DATE}
+              fromMonth={START_DATE}
+              toMonth={END_DATE}
+              selected={selectedDate1}
+              onMonthChange={setSelectedDate1}
+              disabled={{ after: END_DATE }}
+              aria-label="Select a start date"
+            />
+            <Calendar
+              mode="single"
+              defaultMonth={END_DATE}
+              fromMonth={START_DATE}
+              toMonth={END_DATE}
+              selected={selectedDate2}
+              onMonthChange={setSelectedDate2}
+              disabled={{ after: END_DATE }}
+              aria-label="Select an end date"
+            />
+          </div>
         </div>
         <BoardingsDisplay
-          selectedDate1={selectedDate1}
-          selectedDate2={selectedDate2}
+          selectedDate1={selectedDate1.toISOString().substring(0, 7)}
+          selectedDate2={selectedDate2.toISOString().substring(0, 7)}
           boardings={combinedBoardings}
           toggle={toggle}
+          aria-label="List of boarding data"
         />
       </aside>
-      <main className="w-screen h-screen">
+      <main className="z-0 h-screen w-screen bg-red-500">
         {combinedBoardings.length > 0 && (
           <Map
             boardings={combinedBoardings.filter(
-              (boarding) => boarding.percentChange !== ""
+              (boarding) => boarding.percentChange !== "",
             )}
             toggle={toggle}
+            darkMode={darkMode}
+            aria-label="Map of boarding data"
           />
         )}
       </main>
