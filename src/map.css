@@ -1,40 +1,39 @@
+@import "./index.css";
+
 .leaflet-container {
-  width: 100%;
-  height: 100%;
+  @apply h-full w-full bg-background;
 }
 
 .leaflet-interactive {
-  transition: all 0.15s ease-in-out;
-  outline: none;
+  @apply outline-none transition-all duration-0 ease-in-out;
 }
 
 .legend,
-.leaflet-control-zoom a {
-  color: #fff8dc !important;
-  background: rgba(16, 16, 16, 0.8) !important;
+.leaflet-control-zoom a,
+.leaflet-control,
+.leaflet-control-attribution.leaflet-control-attribution {
+  @apply z-30 bg-background text-foreground shadow-sm shadow-[#3a3a3a];
 }
 
-.leaflet-control-attribution {
-  color: #fff8dc !important;
-  background: rgba(22, 22, 22, 0.8) !important;
-  border-radius: 3px 0 0 0;
+.leaflet-control-zoom a:hover {
+  @apply bg-secondary text-secondary-foreground;
 }
 
 .leaflet-control-attribution a {
-  color: #39d !important;
+  @apply text-blue-500;
 }
 
 .leaflet-control-zoom a {
-  transition: all 0.2s ease;
+  @apply transition-all duration-200 ease-in;
 }
 
-.leaflet-control-zoom-in:hover,
-.leaflet-control-zoom-out:hover {
-  background: rgba(16, 16, 16, 1) !important;
+.leaflet-tooltip {
+  @apply z-30 border-muted text-base shadow-sm shadow-black;
 }
 
 .legend {
-  margin: 12px !important;
-  padding: 8px;
-  border-radius: 5px;
+  margin: 1rem;
+  border-radius: 0.375rem;
+  padding: 0.5rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 1);
 }
