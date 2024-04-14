@@ -53,6 +53,7 @@ const colorThresholds = [
 
 const Legend = () => {
   const map = useMap();
+  
 
   useEffect(() => {
     const legend = new L.Control({ position: "topright" });
@@ -104,14 +105,14 @@ function onEachBoarding(
   if (!boardingsLookup[id]) {
     return;
   }
-  const { name, percentChange, monthTotal2 } = boardingsLookup[id];
+  const { name, percentChange, monthTotal, monthTotal2 } = boardingsLookup[id];
   const tooltip = L.tooltip({
     offset: L.point(0, -20),
     direction: "top",
     permanent: false,
     opacity: 1,
   }).setContent(
-    `${name}<br/>${monthTotal2} boardings<br/>${percentChange}% change`,
+    `${name} boardings<br/>${monthTotal} <br/> ${monthTotal2} <br/>${percentChange}% change`,
   );
   layer.bindTooltip(tooltip);
   layer.setStyle({ weight: 3, color: color });
@@ -131,9 +132,11 @@ function onEachBoarding(
 const Map = ({
   toggle,
   boardings,
+  darkMode,
 }: {
   boardings: CombinedBoardings[];
   toggle: boolean;
+  darkMode: boolean;
 }) => {
   // toggle determines which map to use as well as the ID name of each feature
   const map = toggle ? busMap : stationMap;
@@ -161,9 +164,9 @@ const Map = ({
   return (
     <MapContainer center={[41.8781, -87.63]} zoom={13}>
       <TileLayer
-        attribution='&copy; <a href="http://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank"><b>Jawg</b>Maps</a> 
+        attribution='&copy; <a href="http://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank"><b>Jawg</b>Maps</a> | 
                     &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url={`https://{s}.tile.jawg.io/jawg-dark/{z}/{x}/{y}{r}.png?access-token=${jawgToken}`}
+        url={`https://{s}.tile.jawg.io/${darkMode ? "jawg-dark" : "9d2729a1-e087-4eb1-9812-4ffe76008b65"}/{z}/{x}/{y}{r}.png?access-token=${jawgToken}`}
       />
       {!toggle && <RailLines />}
       <GeoJSON
