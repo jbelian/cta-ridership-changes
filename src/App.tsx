@@ -116,7 +116,7 @@ const App = () => {
           CTA Ridership Changes
         </h1>
         <div className="flex items-center justify-between pb-10 pl-5 pr-5">
-          <div className="text-opacity-50">
+          <div>
             <span>Updated </span>
             <time dateTime={lastFetched?.toLocaleString()}>
               {new Date(lastModified.lastModified)
@@ -187,7 +187,7 @@ const App = () => {
                 className="data-[state=checked]:primary-foreground data-[state=unchecked]:primary-foreground border-[1px] border-muted-foreground/30"
                 aria-label="Toggle between train (the L) data and bus data"
               />
-              <Label htmlFor="transitToggle">The Bus</Label>
+              <Label htmlFor="transitToggle">Bus lines</Label>
             </div>
           </div>
           <div className="flex items-center justify-end">
@@ -221,7 +221,7 @@ const App = () => {
           aria-label="List of boarding data"
         />
       </aside>
-      <main className="z-0 h-screen w-screen bg-red-500">
+      <main className="z-0 h-screen w-screen">
         {combinedBoardings.length > 0 && (
           <Map
             boardings={combinedBoardings.filter(
