@@ -2,7 +2,7 @@ name: Pull Data from Chicago Data Portal
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 17 * * *'
+    - cron: "0 17 * * *"
 permissions:
   contents: write
 jobs:
@@ -20,11 +20,11 @@ jobs:
         run: |
           git config --global user.email "actions@users.noreply.github.com"
           git config --global user.name "GitHub Actions"
-        
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10.4'
+          python-version: "3.10.4"
 
       - name: Cache Python dependencies
         uses: actions/cache@v2
@@ -39,7 +39,7 @@ jobs:
 
       - name: Call APIs and download any updated files
         run: python ./scripts/access_api.py
-        
+
       - name: Stage files if they have updated
         run: |
           for file in data/busData.json data/stationData.json data/stationData.json data/lastModified.json; do
@@ -88,7 +88,7 @@ jobs:
 
       - name: Build
         run: npm run build
-      
+
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@4.1.5
         with:

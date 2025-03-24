@@ -1,19 +1,25 @@
-// map.tsx
-
 import { MapContainer, TileLayer, GeoJSON, useMap } from "react-leaflet";
 import { Feature, FeatureCollection, Geometry } from "geojson";
 import L from "leaflet";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import "leaflet/dist/leaflet.css";
-import "./App.css";
-import RailLines from './railLines.tsx'
-import stationMap from '../data/stationMap.json';
-import busMap from '../data/busMap.json';
-import { CombinedBoardings } from '../utils/dataHandlers.tsx';
+import "./map.css";
+import RailLines from "./railLines.tsx";
+import stationMap from "../data/stationMap.json";
+import busMap from "../data/busMap.json";
+import { CombinedBoardings } from "./utils/dataHandlers.tsx";
 
 const jawgToken = import.meta.env.VITE_APP_JAWG_TOKEN;
+const legendGrades = [
+  500, 354, 251, 178, 126, 95, 85, 75, 65, 55, 45, 35, 25, 15, 5, 0, -5, -15,
+  -25, -35, -45, -55, -65, -75, -85, -95,
+];
+// prettier-ignore
+const legendText = [
+  "1000%","","","","","100%","","","","","50%","","","","","0%","","","","","-50%","","","","","-100%",
+];
 
-// Colorblind friendly colors for -100% to 100% derived from
+// Colorblind friendly colors from -100% to 100% derived from
 // "sunset" color scheme here https://personal.sron.nl/~pault/
 // Hot pink added for exponential tail of numbers above 100%
 const colorThresholds = [
@@ -47,20 +53,25 @@ const colorThresholds = [
 
 const Legend = () => {
   const map = useMap();
+  
 
   useEffect(() => {
-    const legend = new L.Control({ position: "topright" })
+    const legend = new L.Control({ position: "topright" });
     function getColor(d: number) {
-      const colorThreshold = colorThresholds.find(threshold => d >= threshold.threshold);
-      return colorThreshold ? colorThreshold.color : "#FFFFFF";
+      const colorThreshold = colorThresholds.find(
+        (threshold) => d >= threshold.threshold,
+      );
+      return colorThreshold ? colorThreshold.color : "#FFF";
     }
     legend.onAdd = () => {
       const div = L.DomUtil.create("div", "info legend");
-      const grades = [500, 354, 251, 178, 126, 95, 85, 75, 65, 55, 45, 35, 25, 15, 5, 0, -5, -15, -25, -35, -45, -55, -65, -75, -85, -95];
-      const text = ["1000%", "", "", "", "", "100%", "", "", "", "", "50%", "", "", "", "", "0%", "", "", "", "", "-50%", "", "", "", "", "-100%"]
-      const labels = grades.map((grade, i) =>
-        '<div style="line-height: 14px;"><i style="background:' + getColor(grade) +
-        '; width: 13px; height: 13px; display: inline-block; vertical-align: top;"></i> ' + text[i] + '</div>'
+      const labels = legendGrades.map(
+        (grade, text) =>
+          '<div style="line-height: 14px;"><i style="background:' +
+          getColor(grade) +
+          '; width: 13px; height: 13px; display: inline-block; vertical-align: top;"></i> ' +
+          legendText[text] +
+          "</div>",
       );
       div.innerHTML = labels.join("");
       return div;
@@ -71,98 +82,115 @@ const Legend = () => {
   return null;
 };
 
-const Map = ({ keyProp, toggleTransitData, boardings }:
-  { boardings: CombinedBoardings[]; keyProp: string; toggleTransitData: boolean }) => {
-  const boardingsLookup = Object.fromEntries(boardings.map(boarding => [boarding.id, boarding]));
-
-  const boardingsSet = new Set(
-    boardings
-      .filter(boarding => boarding.percentChange && boarding.percentChange.trim() !== '')
-      .map(boarding => boarding.id)
+function setColor(boardingsLookup: any, mapID: string) {
+  const matchingBoarding = boardingsLookup[mapID];
+  if (!matchingBoarding) {
+    return "#000";
+  }
+  const percentChange = parseFloat(matchingBoarding.percentChange);
+  const colorThreshold = colorThresholds.find(
+    (threshold) => percentChange >= threshold.threshold,
   );
+  return colorThreshold ? colorThreshold.color : "#000";
+}
 
-  const boardingMap = toggleTransitData ? stationMap : busMap;
-  const idProperty = toggleTransitData ? "Station ID" : "ROUTE";
-
-  const matchingBoardings = {
-    type: "FeatureCollection",
-    features: boardingMap.features.filter((feature) =>
-      boardingsSet.has((feature.properties as any)[idProperty])
-    ),
-  } as FeatureCollection;
-
-  function onEachBoarding(feature: Feature<Geometry, any>, layer: any) {
-    const color = setColor(feature);
-    const { id, name } = feature.properties;
-    if (!boardingsLookup[id]) {
-      console.log(`No boarding data found for id: ${id}`);
-      return;
-    }
-
-    const { percentChange, monthTotal2 } = boardingsLookup[id];
-
-    function highlightFeature(e: any) {
-      const layer = e.target;
+function onEachBoarding(
+  feature: Feature<Geometry, any>,
+  layer: any,
+  boardingsLookup: any,
+  mapID: string,
+) {
+  const id = String((feature.properties as any)[mapID]);
+  const color = setColor(boardingsLookup, id);
+  if (!boardingsLookup[id]) {
+    return;
+  }
+  const { name, percentChange, monthTotal, monthTotal2 } = boardingsLookup[id];
+  const tooltip = L.tooltip({
+    offset: L.point(0, -20),
+    direction: "top",
+    permanent: false,
+    opacity: 1,
+  }).setContent(
+    `${name} boardings<br/>${monthTotal} <br/> ${monthTotal2} <br/>${percentChange}% change`,
+  );
+  layer.bindTooltip(tooltip);
+  layer.setStyle({ weight: 3, color: color });
+  layer.on({
+    mouseover: (e: { latlng: any }) => {
+      layer.setStyle({ weight: 5, color: "#7F0" });
       layer.bringToFront();
-      layer.setStyle({
-        weight: 5,
-        color: "#7F0"
-      });
-    };
+      layer.openTooltip(e.latlng);
+    },
+    mouseout: () => {
+      layer.setStyle({ weight: 3, color: color });
+      layer.closeTooltip();
+    },
+  });
+}
 
-    function resetHighlight(e: any) {
-      e.target.setStyle({
-        weight: 3,
-        color: color,
-      });
-    }
+const Map = ({
+  toggle,
+  boardings,
+  darkMode,
+}: {
+  boardings: CombinedBoardings[];
+  toggle: boolean;
+  darkMode: boolean;
+}) => {
+  // toggle determines which map to use as well as the ID name of each feature
+  const map = toggle ? busMap : stationMap;
+  const mapID = toggle ? "ROUTE" : "Station ID";
 
-    layer.on({ mouseover: highlightFeature, mouseout: resetHighlight });
-    layer.bindTooltip(`${name}<br/>${monthTotal2} boardings<br/>${percentChange}% change`,
-      { sticky: true, direction: 'auto' });
-    layer.setStyle({
-      weight: 3,
-      color: color,
-    });
-  }
+  // boardingsLookup is used for quick feature and color assignment
+  // matchingBoardings filters the map data to only include features with boarding data
+  const { boardingsLookup, matchingBoardings } = useMemo(() => {
+    const boardingsLookup = Object.fromEntries(
+      boardings.map((boarding) => [boarding.id, boarding]),
+    );
+    const matchingBoardings = {
+      type: "FeatureCollection",
+      features: map.features.filter((feature) =>
+        boardings.some(
+          (boarding) =>
+            boarding.id === String((feature.properties as any)[mapID]),
+        ),
+      ),
+    } as FeatureCollection;
 
-  function setColor(feature: Feature<Geometry, any>) {
-    const matchingBoarding = boardingsLookup[feature.properties.id];
-
-    if (!matchingBoarding || !matchingBoarding.percentChange) return;
-
-    const percentChange = parseFloat(matchingBoarding.percentChange);
-    const colorThreshold = colorThresholds.find(threshold => percentChange >= threshold.threshold);
-    return colorThreshold ? colorThreshold.color : "#FFFFFF";
-  }
+    return { boardingsLookup, matchingBoardings };
+  }, [boardings, toggle]);
 
   return (
     <MapContainer center={[41.8781, -87.63]} zoom={13}>
       <TileLayer
-        attribution='&copy; <a href="http://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank"><b>Jawg</b>Maps</a> 
+        attribution='&copy; <a href="http://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank"><b>Jawg</b>Maps</a> | 
                     &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url={`https://{s}.tile.jawg.io/jawg-dark/{z}/{x}/{y}{r}.png?access-token=${jawgToken}`}
+        url={`https://{s}.tile.jawg.io/${darkMode ? "jawg-dark" : "9d2729a1-e087-4eb1-9812-4ffe76008b65"}/{z}/{x}/{y}{r}.png?access-token=${jawgToken}`}
       />
-      {toggleTransitData && <RailLines />}
+      {!toggle && <RailLines />}
       <GeoJSON
-        key={keyProp}
+        key={JSON.stringify(boardingsLookup)}
         data={matchingBoardings}
         pointToLayer={(feature, latlng) => {
-          const matchingBoarding = boardingsLookup[feature.properties.id];
+          const id = feature.properties[mapID];
+          const matchingBoarding = boardingsLookup[id];
           let radius = 8;
           if (matchingBoarding && matchingBoarding.monthTotal2) {
-            radius = Math.sqrt(parseFloat(matchingBoarding.monthTotal2)) * .03;
+            radius = Math.sqrt(parseFloat(matchingBoarding.monthTotal2)) * 0.03;
           }
           return L.circleMarker(latlng, {
             radius: radius,
-            fillColor: setColor(feature),
+            fillColor: setColor(boardingsLookup, id),
             color: "#0F0",
             weight: 1,
             opacity: 1,
             fillOpacity: 0.8,
           });
         }}
-        onEachFeature={onEachBoarding}
+        onEachFeature={(feature, layer) =>
+          onEachBoarding(feature, layer, boardingsLookup, mapID)
+        }
       />
       <Legend />
     </MapContainer>
